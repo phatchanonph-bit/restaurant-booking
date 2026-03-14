@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+
+  backend:
+    build: ./Backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: restaurant
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
