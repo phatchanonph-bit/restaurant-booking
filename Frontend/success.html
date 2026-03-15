@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จองสำเร็จ - My Restaurant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans Thai', sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-image: linear-gradient(rgba(244, 244, 249, 0.9), rgba(244, 244, 249, 0.9)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .success-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: #28a745; /* สีเขียวแสดงความสำเร็จ */
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #b03a48;
+            margin-bottom: 5px;
+            font-size: 26px;
+        }
+
+        p.subtitle {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        /* กล่องสรุปข้อมูล */
+        .details-box {
+            text-align: left;
+            background-color: #fdf5f6;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #f5d6d9;
+            margin-bottom: 30px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 16px;
+            border-bottom: 1px dashed #e0cda7;
+            padding-bottom: 5px;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-label { color: #666; font-weight: bold; }
+        .detail-value { color: #333; font-weight: bold; }
+        .detail-value.highlight { color: #b03a48; font-size: 18px; }
+
+        .btn-home {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #b03a48;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .btn-home:hover { background-color: #8a2d38; }
+    </style>
+</head>
+<body>
+
+    <div class="success-container">
+        <div class="success-icon">✔️</div>
+        <h1>จองโต๊ะสำเร็จ!</h1>
+        <p class="subtitle">ขอบคุณที่เลือกใช้บริการร้านของเรา</p>
+        
+        <div class="details-box">
+            <div class="detail-item">
+                <span class="detail-label">ชื่อผู้จอง:</span>
+                <span class="detail-value" id="res-name">-</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">เบอร์โทรศัพท์:</span>
+                <span class="detail-value" id="res-phone">-</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">จำนวนคน:</span>
+                <span class="detail-value" id="res-pax">-</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">วันที่:</span>
+                <span class="detail-value" id="res-date">-</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">เวลา:</span>
+                <span class="detail-value" id="res-time">-</span>
+            </div>
+            <div class="detail-item" style="margin-top: 15px;">
+                <span class="detail-label">โต๊ะที่เลือก:</span>
+                <span class="detail-value highlight" id="res-table">-</span>
+            </div>
+        </div>
+        
+        <a href="index.html" class="btn-home">กลับสู่หน้าหลัก</a>
+    </div>
+
+    <script>
+        // ดึงข้อมูลที่บันทึกไว้ใน localStorage มาแสดงผล
+        document.getElementById('res-name').innerText = localStorage.getItem('bookName') || '-';
+        document.getElementById('res-phone').innerText = localStorage.getItem('bookPhone') || '-';
+        document.getElementById('res-pax').innerText = localStorage.getItem('bookPax') || '-';
+        document.getElementById('res-date').innerText = localStorage.getItem('bookDate') || '-';
+        document.getElementById('res-time').innerText = localStorage.getItem('bookTime') || '-';
+        document.getElementById('res-table').innerText = localStorage.getItem('bookTable') || '-';
+    </script>
+
+</body>
+</html>

@@ -187,3 +187,88 @@ transform:scale(1.05);
 transition:0.3s;
 
 }
+
+/* =========================================
+   ลูกเล่นปุ่มจองโต๊ะ (ปุ่ม btn-book)
+========================================= */
+.btn-book {
+    background: linear-gradient(45deg, #ffcc00, #ffe600); /* ไล่สีเหลืองทองให้เข้ากับชื่อหัวข้อ */
+    color: #8a2d38; /* ตัวหนังสือสีแดงเข้มให้อ่านง่ายและกลืนกับพื้นหลัง */
+    border: none;
+    padding: 15px 40px;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Noto Sans Thai', sans-serif;
+    border-radius: 50px; /* ทำให้ปุ่มมนเป็นรูปทรงแคปซูล */
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 204, 0, 0.4); /* ใส่เงาสีเหลืองบางๆ ให้ปุ่มดูลอย */
+    transition: all 0.3s ease; /* ทำให้เอฟเฟกต์เคลื่อนไหวนุ่มนวล */
+    margin-top: 20px;
+}
+
+/* เอฟเฟกต์ตอนเอาเมาส์ไปชี้ (Hover) */
+.btn-book:hover {
+    transform: translateY(-5px) scale(1.05); /* เด้งลอยขึ้นด้านบน 5px และขยายขนาดนิดนึง */
+    box-shadow: 0 10px 25px rgba(255, 204, 0, 0.7); /* เงาสว่างและกว้างขึ้น เหมือนปุ่มเรืองแสง */
+    background: linear-gradient(45deg, #ffe600, #fff066); /* สีสว่างขึ้น */
+}
+
+/* เอฟเฟกต์ตอนคลิกเมาส์ (Active) */
+.btn-book:active {
+    transform: translateY(2px); /* กดแล้วปุ่มยุบลงไปนิดนึงให้ดูสมจริง */
+    box-shadow: 0 2px 10px rgba(255, 204, 0, 0.4);
+}
+
+/* ================= แถบ Navigation Bar ================= */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white; /* พื้นหลังสีขาวให้ตัดกับสีแดง */
+    padding: 15px 40px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* เงาบางๆ ให้ดูมีมิติ */
+    position: sticky; /* ทำให้เมนูติดอยู่ด้านบนตอนเลื่อนหน้าจอ */
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #b03a48; /* สีแดงเดียวกับธีมร้าน */
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.nav-links li a:hover {
+    color: #b03a48; /* ตอนเอาเมาส์ชี้ให้เปลี่ยนเป็นสีแดง */
+}
+
+/* ตกแต่งปุ่มแอดมินให้ดูเด่นขึ้นมานิดนึง */
+.admin-link {
+    background-color: #333;
+    color: white !important;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+.admin-link:hover {
+    background-color: #555;
+    color: white !important;
+}

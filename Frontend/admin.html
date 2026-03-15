@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบหลังบ้าน - จัดการการจอง</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans Thai', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .admin-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #b03a48;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #fdf5f6;
+            color: #b03a48;
+        }
+
+        /* ป้ายสถานะ */
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .status.pending { background-color: #fff3cd; color: #856404; } /* รอยืนยัน */
+        .status.approved { background-color: #d4edda; color: #155724; } /* ยืนยันแล้ว */
+        .status.rejected { background-color: #f8d7da; color: #721c24; } /* ปฏิเสธ */
+
+        /* ปุ่มจัดการ */
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Noto Sans Thai', sans-serif;
+            font-weight: bold;
+            color: white;
+            margin: 0 5px;
+            transition: 0.3s;
+        }
+        .btn-approve { background-color: #28a745; }
+        .btn-approve:hover { background-color: #218838; }
+        
+        .btn-reject { background-color: #dc3545; }
+        .btn-reject:hover { background-color: #c82333; }
+
+        .empty-message {
+            text-align: center;
+            color: #888;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <h1>จัดการคิวจองโต๊ะ (Admin)</h1>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ชื่อผู้จอง</th>
+                    <th>เบอร์โทร</th>
+                    <th>จำนวน</th>
+                    <th>วันที่ - เวลา</th>
+                    <th>โต๊ะที่เลือก</th>
+                    <th>สถานะ</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody id="booking-list">
+                </tbody>
+        </table>
+        
+        <div id="no-data" class="empty-message" style="display: none;">ไม่มีรายการจองใหม่ในขณะนี้</div>
+    </div>
+
+    <script>
+        // โหลดข้อมูลจาก localStorage มาแสดง
+        function loadBookings() {
+            const tableBody = document.getElementById('booking-list');
+            const noDataMsg = document.getElementById('no-data');
+            
+            // ดึงข้อมูลการจองล่าสุดมาเช็ค
+            const name = localStorage.getItem('bookName');
+            
+            if (name) {
+                const phone = localStorage.getItem('bookPhone');
+                const pax = localStorage.getItem('bookPax');
+                const date = localStorage.getItem('bookDate');
+                const time = localStorage.getItem('bookTime');
+                const table = localStorage.getItem('bookTable');
+                
+                // ดึงสถานะปัจจุบัน ถ้าไม่มีให้เป็น 'pending' (รอยืนยัน)
+                const status = localStorage.getItem('bookStatus') || 'pending';
+                
+                let statusHtml = '';
+                if(status === 'pending') statusHtml = '<span class="status pending">รอยืนยัน</span>';
+                if(status === 'approved') statusHtml = '<span class="status approved">ยืนยันแล้ว</span>';
+                if(status === 'rejected') statusHtml = '<span class="status rejected">ปฏิเสธแล้ว</span>';
+
+                // สร้างแถวข้อมูล
+                tableBody.innerHTML = `
+                    <tr>
+                        <td>${name}</td>
+                        <td>${phone}</td>
+                        <td>${pax}</td>
+                        <td>${date} <br> ${time}</td>
+                        <td><b>${table}</b></td>
+                        <td>${statusHtml}</td>
+                        <td>
+                            <button class="btn btn-approve" onclick="updateStatus('approved')">✔️ ยืนยัน</button>
+                            <button class="btn btn-reject" onclick="updateStatus('rejected')">❌ ปฏิเสธ</button>
+                        </td>
+                    </tr>
+                `;
+                noDataMsg.style.display = 'none';
+            } else {
+                tableBody.innerHTML = '';
+                noDataMsg.style.display = 'block';
+            }
+        }
+
+        // ฟังก์ชันอัปเดตสถานะเมื่อร้านกดปุ่ม
+        function updateStatus(newStatus) {
+            // บันทึกสถานะใหม่ลงไป
+            localStorage.setItem('bookStatus', newStatus);
+            
+            if (newStatus === 'approved') {
+                alert('คุณได้ยืนยันการจองนี้แล้ว โต๊ะจะถูกล็อก!');
+            } else {
+                alert('คุณปฏิเสธการจองนี้ โต๊ะจะกลับมาว่าง!');
+            }
+            
+            // รีเฟรชตารางใหม่
+            loadBookings();
+        }
+
+        // เรียกใช้ฟังก์ชันตอนเปิดหน้าเว็บ
+        loadBookings();
+    </script>
+
+</body>
+</html>

@@ -1,52 +1,167 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จองโต๊ะ - My Restaurant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans Thai', sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-image: linear-gradient(rgba(244, 244, 249, 0.9), rgba(244, 244, 249, 0.9)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4');
+            background-size: cover;
+            background-position: center;
+        }
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        .booking-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+        }
 
-<title>จองโต๊ะ</title>
+        h1 {
+            text-align: center;
+            color: #b03a48;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
 
-<link rel="stylesheet" href="style.css">
+        .form-group { margin-bottom: 20px; }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #444;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: 'Noto Sans Thai', sans-serif;
+            font-size: 16px;
+        }
 
+        input:focus {
+            border-color: #b03a48;
+            outline: none;
+            box-shadow: 0 0 5px rgba(176, 58, 72, 0.3);
+        }
+
+        .row-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .row-group .form-group { flex: 1; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background-color: #b03a48;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Noto Sans Thai', sans-serif;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover { background-color: #8a2d38; }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            color: #b03a48;
+            text-decoration: underline;
+        }
+    </style>
 </head>
-
 <body>
 
-<header>
-<h1>จองโต๊ะร้านอาหาร</h1>
-</header>
+    <div class="booking-container">
+        <h1>จองโต๊ะร้านอาหาร</h1>
+        
+        <form id="bookingForm" onsubmit="goToSelectSeat(event)">
+            <div class="form-group">
+                <label for="name">ชื่อ-นามสกุล</label>
+                <input type="text" id="name" placeholder="กรอกชื่อของคุณ" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">เบอร์โทรศัพท์</label>
+                <input type="tel" id="phone" placeholder="08xxxxxxxx" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="guests">จำนวนคน</label>
+                <input type="number" id="guests" min="1" placeholder="ระบุจำนวนคน" required>
+            </div>
+            
+            <div class="row-group">
+                <div class="form-group">
+                    <label for="date">วันที่</label>
+                    <input type="date" id="date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="time">เวลา</label>
+                    <input type="time" id="time" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-submit">ไปเลือกโต๊ะ →</button>
+        </form>
+        
+        <a href="index.html" class="back-link">← กลับไปหน้าหลัก</a>
+    </div>
 
-<section class="booking">
+    <script>
+        function goToSelectSeat(event) {
+            // ป้องกันไม่ให้ฟอร์มโหลดหน้าใหม่แบบปกติ
+            event.preventDefault(); 
+            
+            // 1. ดึงข้อมูลที่ลูกค้ากรอกมาเก็บไว้ในตัวแปร
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const guests = document.getElementById('guests').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
 
-<h2>กรอกข้อมูลการจอง</h2>
-
-<form>
-
-<label>ชื่อ</label>
-<input type="text" placeholder="กรอกชื่อ">
-
-<label>เบอร์โทร</label>
-<input type="tel" placeholder="08xxxxxxxx">
-
-<label>จำนวนคน</label>
-<input type="number">
-
-<label>วันที่</label>
-<input type="date">
-
-<label>เวลา</label>
-<input type="time">
-
-<button type="submit">จองโต๊ะ</button>
-
-</form>
-
-</section>
+            // 2. บันทึกข้อมูลลงใน localStorage เพื่อส่งต่อไปหน้า success
+            localStorage.setItem('bookName', name);
+            localStorage.setItem('bookPhone', phone);
+            localStorage.setItem('bookPax', guests + ' ท่าน');
+            localStorage.setItem('bookDate', date);
+            localStorage.setItem('bookTime', time);
+            
+            // 3. พาไปหน้าเลือกโต๊ะ
+            window.location.href = 'select-seat.html';
+        }
+    </script>
 
 </body>
-
 </html>
