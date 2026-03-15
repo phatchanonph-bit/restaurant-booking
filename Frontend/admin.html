@@ -81,6 +81,23 @@
             margin-top: 20px;
             font-style: italic;
         }
+
+        /* ปุ่มย้อนกลับ */
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #b03a48;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -105,6 +122,8 @@
         </table>
         
         <div id="no-data" class="empty-message" style="display: none;">ไม่มีรายการจองใหม่ในขณะนี้</div>
+
+        <a href="index.html" class="back-link">← กลับไปหน้าหลัก</a>
     </div>
 
     <script>
