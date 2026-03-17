@@ -1,24 +1,24 @@
-version: "3.9"
+version: '3.8'
 
 services:
-
-  backend:
-    build: ./Backend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-    restart: always
-
   db:
-    image: mysql:8
+    image: mysql:8.0
+    container_name: restaurant_mysql
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: restaurant
     ports:
       - "3307:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
 
-volumes:
-  mysql_data:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: restaurant_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - "8080:80"
+    depends_on:
+      - db

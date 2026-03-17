@@ -151,15 +151,42 @@
             const date = document.getElementById('date').value;
             const time = document.getElementById('time').value;
 
-            // 2. บันทึกข้อมูลลงใน localStorage เพื่อส่งต่อไปหน้า success
-            localStorage.setItem('bookName', name);
-            localStorage.setItem('bookPhone', phone);
-            localStorage.setItem('bookPax', guests + ' ท่าน');
-            localStorage.setItem('bookDate', date);
-            localStorage.setItem('bookTime', time);
-            
-            // 3. พาไปหน้าเลือกโต๊ะ
-            window.location.href = 'select-seat.html';
+            // 2. เตรียมแพ็กเกจข้อมูลเพื่อส่งไปให้ Backend (Database)
+            const data = {
+                name: name,
+                phone: phone,
+                people: guests, // เปลี่ยนเป็นคำว่า people ตามฐานข้อมูล
+                date: date,
+                time: time
+            };
+
+            // 3. ยิงข้อมูลไปให้ Backend ที่ port 3000
+            fetch("http://localhost:3000/book", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(result => {
+                // ถ้าบันทึกลง Database สำเร็จ ค่อยทำงานส่วนนี้ต่อ
+                
+                // เก็บข้อมูลลง localStorage สำหรับหน้าต่อไป (เผื่อต้องใช้)
+                localStorage.setItem('bookName', name);
+                localStorage.setItem('bookPhone', phone);
+                localStorage.setItem('bookPax', guests + ' ท่าน');
+                localStorage.setItem('bookDate', date);
+                localStorage.setItem('bookTime', time);
+                
+                // แจ้งเตือนแล้วพาไปหน้าเลือกโต๊ะ
+                window.location.href = 'select-seat.html';
+            })
+            .catch(error => {
+                // ถ้าเซิร์ฟเวอร์ตาย หรือ Database พัง จะเด้งอันนี้
+                console.error("Error:", error);
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล โปรดลองอีกครั้ง");
+            });
         }
     </script>
 

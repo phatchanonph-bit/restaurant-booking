@@ -238,35 +238,64 @@
 
         tables.forEach(table => {
             table.addEventListener('click', () => {
-                // 1. เช็คก่อนว่าโต๊ะนี้ "กำลังถูกเลือกอยู่" หรือไม่
                 const isAlreadySelected = table.classList.contains('selected');
-
-                // 2. ล้างสีโต๊ะทั้งหมดออกก่อน
                 tables.forEach(t => t.classList.remove('selected'));
-
-                // 3. ถ้าโต๊ะนี้ยังไม่ถูกเลือก ให้เพิ่มสี
                 if (!isAlreadySelected) {
                     table.classList.add('selected');
                 }
             });
         });
 
-        // แก้ไขฟังก์ชันยืนยันที่นั่งตรงนี้ครับ
-        function confirmSeat() {
-            const selectedTable = document.querySelector('.table-box.selected');
-            if (selectedTable) {
-                // ดึงชื่อโต๊ะ
-                const tableName = selectedTable.querySelector('.table-name').innerText;
-                
-                // บันทึกชื่อโต๊ะลง localStorage
-                localStorage.setItem('bookTable', tableName);
-                
-                // พาไปหน้า success.html ทันที
-                window.location.href = 'success.html'; 
-            } else {
-                alert('กรุณาเลือกโต๊ะก่อนกดยืนยันครับ');
-            }
-        }
+        // ---------------------------------------------------------
+        // แก้ไขฟังก์ชัน confirmSeat() เพื่อยิงข้อมูลเข้า Database
+        // ---------------------------------------------------------
+       function confirmSeat() {
+    const selectedTable = document.querySelector('.table-box.selected');
+    
+    if (selectedTable) {
+        // 1. ดึงชื่อโต๊ะที่ลูกค้ากดเลือก (เช่น "โต๊ะ 1")
+        const tableName = selectedTable.querySelector('.table-name').innerText;
+        
+        // เก็บลง localStorage ไว้โชว์ที่หน้า success.html
+        localStorage.setItem('bookTable', tableName);
+        
+        // 2. ดึงข้อมูลจาก localStorage และจัดการให้เป็นรูปแบบที่ DB ต้องการ
+        // ใช้ parseInt เพื่อตัดคำว่า "ท่าน" ออก ให้เหลือแต่ตัวเลขเพียวๆ เพื่อแก้ Error
+        const rawPax = localStorage.getItem('bookPax') || "0";
+        const cleanPax = parseInt(rawPax); 
+
+        const data = {
+            name: localStorage.getItem('bookName'),
+            phone: localStorage.getItem('bookPhone'),
+            people: cleanPax, // ส่งเฉพาะตัวเลข (Integer) เข้า Database
+            date: localStorage.getItem('bookDate'),
+            time: localStorage.getItem('bookTime'),
+            table_number: tableName // ส่งชื่อโต๊ะไปบันทึกในคอลัมน์ table_number
+        };
+
+        // 3. ยิงข้อมูลทั้งหมดไปที่ Backend
+        fetch("http://localhost:3000/book", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(result => {
+            console.log("บันทึกสำเร็จ:", result);
+            // 4. บันทึกเสร็จเรียบร้อย ค่อยไปหน้า success.html
+            window.location.href = 'success.html'; 
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล โปรดลองอีกครั้ง");
+        });
+
+    } else {
+        alert('กรุณาเลือกโต๊ะก่อนกดยืนยันครับ');
+    }
+}
     </script>
 
 </body>
