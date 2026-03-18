@@ -1,0 +1,97 @@
+body {
+    font-family: 'Noto Sans Thai', sans-serif;
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-image: linear-gradient(rgba(244, 244, 249, 0.9), rgba(244, 244, 249, 0.9)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4');
+    background-size: cover;
+    background-position: center;
+}
+
+.booking-container {
+    background-color: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+h1 {
+    text-align: center;
+    color: #b03a48;
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #444;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-size: 16px;
+}
+
+input:focus {
+    border-color: #b03a48;
+    outline: none;
+    box-shadow: 0 0 5px rgba(176, 58, 72, 0.3);
+}
+
+.row-group {
+    display: flex;
+    gap: 15px;
+}
+
+.row-group .form-group {
+    flex: 1;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 15px;
+    background-color: #b03a48;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Noto Sans Thai', sans-serif;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    background-color: #8a2d38;
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.back-link:hover {
+    color: #b03a48;
+    text-decoration: underline;
+}
