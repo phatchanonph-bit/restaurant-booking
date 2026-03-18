@@ -1,4 +1,15 @@
-const API_URL = "http://localhost:3000";
+const API_URL = (() => {
+    if (!window.location.protocol.startsWith("http")) {
+        return "http://localhost:3000";
+    }
+
+    if (window.location.port === "3000") {
+        return window.location.origin;
+    }
+
+    const host = window.location.hostname || "localhost";
+    return `${window.location.protocol}//${host}:3000`;
+})();
 const tables = document.querySelectorAll('.table-box');
 const confirmButton = document.getElementById('confirm-button');
 const slotLabel = document.getElementById('booking-slot');

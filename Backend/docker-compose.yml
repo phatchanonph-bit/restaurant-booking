@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: mysql:8.0
@@ -9,11 +7,14 @@ services:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: restaurant
       MYSQL_ROOT_HOST: "%"
-    ports:
-      - "3307:3306"
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/init:/docker-entrypoint-initdb.d
@@ -32,12 +33,15 @@ services:
       DB_PASSWORD: 1234
       DB_NAME: restaurant
       RESET_BOOKINGS_ON_START: "true"
+      FRONTEND_DIR: /frontend
     ports:
       - "3000:3000"
     volumes:
       - ./:/app
+      - ../Frontend:/frontend:ro
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -49,8 +53,8 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - db
-      - backend
+      db:
+        condition: service_healthy
 
 volumes:
   mysql_data:

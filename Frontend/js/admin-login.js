@@ -1,4 +1,15 @@
-const API_URL = "http://localhost:3000";
+const API_URL = (() => {
+    if (!window.location.protocol.startsWith("http")) {
+        return "http://localhost:3000";
+    }
+
+    if (window.location.port === "3000") {
+        return window.location.origin;
+    }
+
+    const host = window.location.hostname || "localhost";
+    return `${window.location.protocol}//${host}:3000`;
+})();
 const ADMIN_TOKEN_KEY = 'restaurant_admin_token';
 const ADMIN_USER_KEY = 'restaurant_admin_user';
 const adminForm = document.getElementById('login-form');
