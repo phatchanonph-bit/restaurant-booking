@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบหลังบ้าน - จัดการการจอง</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
-    
     <style>
         body {
             font-family: 'Noto Sans Thai', sans-serif;
@@ -18,7 +17,7 @@
             background-color: white;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             max-width: 1100px;
             margin: 0 auto;
         }
@@ -44,10 +43,27 @@
             font-weight: bold;
         }
 
+        .section-title {
+            margin-top: 28px;
+            margin-bottom: 10px;
+            color: #b03a48;
+            font-size: 22px;
+        }
+
+        .section-subtitle {
+            margin: 0 0 12px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         th, td {
@@ -141,10 +157,16 @@
         .empty-message {
             text-align: center;
             color: #888;
-            margin-top: 30px;
-            padding: 40px;
+            margin-top: 16px;
+            padding: 28px;
             border: 2px dashed #ddd;
             border-radius: 10px;
+        }
+
+        .section-divider {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 6px;
         }
 
         .back-link {
@@ -158,41 +180,77 @@
     </style>
 </head>
 <body>
+    <script>
+        if (localStorage.getItem('restaurant_admin_access') !== 'granted') {
+            window.location.href = 'admin-login.html';
+        }
+    </script>
 
     <div class="admin-container">
         <h1>จัดการคิวจองโต๊ะ (Admin Panel)</h1>
         <div class="status-row">
             <div id="live-status" class="live-indicator">Realtime: กำลังเชื่อมต่อ...</div>
             <div id="last-update">อัปเดตล่าสุด: -</div>
+            <button id="logout-button" class="btn btn-delete" type="button">ออกจากระบบ</button>
         </div>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>ชื่อผู้จอง</th>
-                    <th>เบอร์โทร</th>
-                    <th>จำนวน</th>
-                    <th>รอบจอง</th>
-                    <th>โต๊ะ / รอบ</th>
-                    <th>สถานะ</th>
-                    <th>จัดการ</th>
-                </tr>
-            </thead>
-            <tbody id="booking-list"></tbody>
-        </table>
-        
-        <div id="no-data" class="empty-message" style="display: none;">ไม่มีรายการจองในระบบขณะนี้</div>
+
+        <h2 class="section-title">รายการรอดำเนินการ</h2>
+        <p class="section-subtitle">แสดงรายการที่ยังรอยืนยัน หรือรายการที่ถูกปฏิเสธแล้ว</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ชื่อผู้จอง</th>
+                        <th>เบอร์โทร</th>
+                        <th>จำนวน</th>
+                        <th>รอบจอง</th>
+                        <th>โต๊ะ / รอบ</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="booking-list"></tbody>
+            </table>
+        </div>
+        <div id="no-data" class="empty-message" style="display: none;">ไม่มีรายการจองที่ต้องจัดการในตอนนี้</div>
+
+        <div class="section-divider">
+            <h2 class="section-title">รายการที่ยืนยันแล้ว</h2>
+            <p class="section-subtitle">เมื่อกดยืนยัน รายการจะย้ายมาแสดงในส่วนนี้อัตโนมัติ</p>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ชื่อผู้จอง</th>
+                            <th>เบอร์โทร</th>
+                            <th>จำนวน</th>
+                            <th>รอบจอง</th>
+                            <th>โต๊ะ / รอบ</th>
+                            <th>สถานะ</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approved-booking-list"></tbody>
+                </table>
+            </div>
+            <div id="no-approved-data" class="empty-message" style="display: none;">ยังไม่มีรายการที่ยืนยันแล้ว</div>
+        </div>
 
         <a href="index.html" class="back-link">← กลับไปหน้าหลัก</a>
     </div>
 
     <script>
+        const ADMIN_ACCESS_KEY = 'restaurant_admin_access';
         const API_URL = "http://localhost:3000";
-        const tableBody = document.getElementById('booking-list');
+        const pendingTableBody = document.getElementById('booking-list');
+        const approvedTableBody = document.getElementById('approved-booking-list');
         const noDataMsg = document.getElementById('no-data');
+        const noApprovedDataMsg = document.getElementById('no-approved-data');
         const liveStatus = document.getElementById('live-status');
         const lastUpdate = document.getElementById('last-update');
+        const logoutButton = document.getElementById('logout-button');
 
         function setLastUpdate() {
             lastUpdate.textContent = `อัปเดตล่าสุด: ${new Date().toLocaleString('th-TH')}`;
@@ -229,54 +287,85 @@
             return `${nextHours}:${nextMinutes}:00`;
         }
 
+        function createActionButtons(book) {
+            const approveButton = book.status === 'ยืนยันแล้ว'
+                ? ''
+                : `<button class="btn btn-approve" onclick="updateStatus(${book.id}, 'ยืนยันแล้ว')">ยืนยัน</button>`;
+
+            return `
+                ${approveButton}
+                <button class="btn btn-reject" onclick="rejectBooking(${book.id})">ปฏิเสธ</button>
+                <button class="btn btn-delete" onclick="deleteBooking(${book.id})">ลบ</button>
+            `;
+        }
+
+        function createBookingRow(book) {
+            const statusClass = getStatusClass(book.status);
+            const bookingDate = formatBookingDate(book.date);
+            const bookingEndTime = addHoursToTime(book.time, 3);
+            const tableDisplay = book.table_number
+                ? `
+                    <div class="table-summary">
+                        <span class="table-chip">${book.table_number}</span>
+                        <span class="slot-hint">${bookingDate} ${book.time} - ${bookingEndTime}</span>
+                    </div>
+                `
+                : '<span class="table-pending">ยังไม่ได้เลือกโต๊ะ</span>';
+
+            return `
+                <tr>
+                    <td>${book.id}</td>
+                    <td>${book.name}</td>
+                    <td>${book.phone}</td>
+                    <td>${book.people} ท่าน</td>
+                    <td class="slot-cell">
+                        <span class="slot-date">${bookingDate}</span>
+                        <span class="slot-time">${book.time} - ${bookingEndTime}</span>
+                    </td>
+                    <td>${tableDisplay}</td>
+                    <td><span class="status ${statusClass}">${book.status || 'รอยืนยัน'}</span></td>
+                    <td>${createActionButtons(book)}</td>
+                </tr>
+            `;
+        }
+
+        function renderBookings(list, targetElement, emptyElement, emptyText) {
+            targetElement.innerHTML = '';
+
+            if (!list.length) {
+                emptyElement.textContent = emptyText;
+                emptyElement.style.display = 'block';
+                return;
+            }
+
+            emptyElement.style.display = 'none';
+            targetElement.innerHTML = list.map(createBookingRow).join('');
+        }
+
         async function loadBookings() {
             try {
                 const res = await fetch(`${API_URL}/admin/bookings`);
                 const data = await res.json();
 
-                tableBody.innerHTML = '';
-
-                if (!Array.isArray(data) || data.length === 0) {
-                    noDataMsg.style.display = 'block';
-                    setLastUpdate();
-                    return;
+                if (!Array.isArray(data)) {
+                    throw new Error('รูปแบบข้อมูลไม่ถูกต้อง');
                 }
 
-                noDataMsg.style.display = 'none';
+                const approvedBookings = data.filter(book => book.status === 'ยืนยันแล้ว');
+                const otherBookings = data.filter(book => book.status !== 'ยืนยันแล้ว');
 
-                data.forEach(book => {
-                    const statusClass = getStatusClass(book.status);
-                    const bookingDate = formatBookingDate(book.date);
-                    const bookingEndTime = addHoursToTime(book.time, 3);
-                    const tableDisplay = book.table_number
-                        ? `
-                            <div class="table-summary">
-                                <span class="table-chip">${book.table_number}</span>
-                                <span class="slot-hint">${bookingDate} ${book.time} - ${bookingEndTime}</span>
-                            </div>
-                        `
-                        : '<span class="table-pending">ยังไม่ได้เลือกโต๊ะ</span>';
-                    const row = `
-                        <tr>
-                            <td>${book.id}</td>
-                            <td>${book.name}</td>
-                            <td>${book.phone}</td>
-                            <td>${book.people} ท่าน</td>
-                            <td class="slot-cell">
-                                <span class="slot-date">${bookingDate}</span>
-                                <span class="slot-time">${book.time} - ${bookingEndTime}</span>
-                            </td>
-                            <td>${tableDisplay}</td>
-                            <td><span class="status ${statusClass}">${book.status || 'รอยืนยัน'}</span></td>
-                            <td>
-                                <button class="btn btn-approve" onclick="updateStatus(${book.id}, 'ยืนยันแล้ว')">ยืนยัน</button>
-                                <button class="btn btn-reject" onclick="updateStatus(${book.id}, 'ปฏิเสธแล้ว')">ปฏิเสธ</button>
-                                <button class="btn btn-delete" onclick="deleteBooking(${book.id})">ลบ</button>
-                            </td>
-                        </tr>
-                    `;
-                    tableBody.innerHTML += row;
-                });
+                renderBookings(
+                    otherBookings,
+                    pendingTableBody,
+                    noDataMsg,
+                    'ไม่มีรายการจองที่ต้องจัดการในตอนนี้'
+                );
+                renderBookings(
+                    approvedBookings,
+                    approvedTableBody,
+                    noApprovedDataMsg,
+                    'ยังไม่มีรายการที่ยืนยันแล้ว'
+                );
 
                 setLastUpdate();
             } catch (err) {
@@ -301,8 +390,16 @@
             }
         }
 
-        async function deleteBooking(id) {
-            if (!confirm(`ต้องการลบรายการจอง ID: ${id} หรือไม่?`)) {
+        async function rejectBooking(id) {
+            if (!confirm(`ต้องการปฏิเสธและลบรายการจอง ID: ${id} หรือไม่?`)) {
+                return;
+            }
+
+            await deleteBooking(id, true);
+        }
+
+        async function deleteBooking(id, skipConfirm = false) {
+            if (!skipConfirm && !confirm(`ต้องการลบรายการจอง ID: ${id} หรือไม่?`)) {
                 return;
             }
 
@@ -331,6 +428,18 @@
         eventSource.onerror = () => {
             liveStatus.textContent = 'Realtime: หลุดการเชื่อมต่อ กำลังเชื่อมต่อใหม่...';
         };
+
+        logoutButton.addEventListener('click', () => {
+            localStorage.removeItem(ADMIN_ACCESS_KEY);
+            window.location.href = 'admin-login.html';
+        });
+
+        const autoRefreshInterval = setInterval(loadBookings, 30000);
+
+        window.addEventListener('beforeunload', () => {
+            clearInterval(autoRefreshInterval);
+            eventSource.close();
+        });
 
         window.onload = loadBookings;
     </script>

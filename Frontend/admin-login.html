@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบแอดมิน - My Restaurant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f7f0e8;
+            --surface: rgba(255, 252, 248, 0.94);
+            --ink: #2c1d1a;
+            --muted: #75635d;
+            --brand: #8f2232;
+            --brand-dark: #681826;
+            --accent: #f0b457;
+            --border: rgba(104, 24, 38, 0.12);
+            --shadow: 0 24px 60px rgba(68, 25, 22, 0.16);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            font-family: 'Noto Sans Thai', sans-serif;
+            color: var(--ink);
+            background:
+                linear-gradient(rgba(247, 240, 232, 0.8), rgba(247, 240, 232, 0.88)),
+                url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 460px;
+            padding: 34px;
+            border-radius: 28px;
+            background: var(--surface);
+            backdrop-filter: blur(14px);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(143, 34, 50, 0.1);
+            color: var(--brand);
+            font-weight: 800;
+            font-size: 0.88rem;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.35rem;
+            line-height: 1.05;
+            color: var(--brand-dark);
+        }
+
+        .subtitle {
+            margin: 14px 0 22px;
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        .field-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 800;
+            color: var(--brand-dark);
+        }
+
+        .password-input {
+            width: 100%;
+            min-height: 54px;
+            padding: 0 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            font-family: 'Noto Sans Thai', sans-serif;
+            outline: none;
+        }
+
+        .password-input:focus {
+            border-color: rgba(143, 34, 50, 0.4);
+            box-shadow: 0 0 0 4px rgba(143, 34, 50, 0.08);
+        }
+
+        .error-message {
+            min-height: 22px;
+            margin-top: 10px;
+            color: #c23b4d;
+            font-size: 0.92rem;
+            font-weight: 700;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .btn-login,
+        .back-link {
+            min-height: 56px;
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            text-decoration: none;
+            font-family: 'Noto Sans Thai', sans-serif;
+        }
+
+        .btn-login {
+            border: none;
+            cursor: pointer;
+            color: white;
+            background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+            box-shadow: 0 18px 34px rgba(104, 24, 38, 0.22);
+            font-size: 1rem;
+        }
+
+        .back-link {
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(104, 24, 38, 0.08);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="badge">Admin Access</div>
+        <h1>เข้าสู่ระบบแอดมิน</h1>
+        <p class="subtitle">ใส่รหัสผ่านก่อนเข้าหน้าจัดการคิวจอง เพื่อป้องกันไม่ให้ลูกค้าเข้าถึงเมนูแอดมินได้โดยตรง</p>
+
+        <form id="login-form">
+            <label class="field-label" for="admin-password">รหัสผ่านแอดมิน</label>
+            <input id="admin-password" class="password-input" type="password" placeholder="กรอกรหัสผ่าน" autocomplete="current-password" required>
+            <div id="error-message" class="error-message"></div>
+
+            <div class="actions">
+                <button type="submit" class="btn-login">เข้าสู่หน้าแอดมิน</button>
+                <a href="index.html" class="back-link">← กลับไปหน้าหลัก</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = '123456';
+        const ADMIN_ACCESS_KEY = 'restaurant_admin_access';
+        const adminForm = document.getElementById('login-form');
+        const passwordInput = document.getElementById('admin-password');
+        const errorMessage = document.getElementById('error-message');
+
+        if (localStorage.getItem(ADMIN_ACCESS_KEY) === 'granted') {
+            window.location.href = 'admin.html';
+        }
+
+        adminForm.addEventListener('submit', event => {
+            event.preventDefault();
+
+            if (passwordInput.value !== ADMIN_PASSWORD) {
+                errorMessage.textContent = 'รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่';
+                passwordInput.focus();
+                passwordInput.select();
+                return;
+            }
+
+            localStorage.setItem(ADMIN_ACCESS_KEY, 'granted');
+            window.location.href = 'admin.html';
+        });
+    </script>
+</body>
+</html>

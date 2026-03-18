@@ -38,13 +38,55 @@ function broadcastBookingChange(action, payload = {}) {
     }
 }
 
-function getBookings(_, res) {
-    const sql = "SELECT * FROM bookings ORDER BY id DESC";
-    db.query(sql, (err, results) => {
-        if (err) {
-            return res.status(500).json({ error: "ไม่สามารถดึงข้อมูลการจองได้" });
+function cleanupExpiredBookings(callback = () => {}) {
+    const findExpiredSql = `
+        SELECT *
+        FROM bookings
+        WHERE TIMESTAMP(date, time) <= DATE_SUB(NOW(), INTERVAL 3 HOUR)
+    `;
+
+    db.query(findExpiredSql, (findErr, expiredBookings) => {
+        if (findErr) {
+            return callback(findErr);
         }
-        res.json(results);
+
+        if (!expiredBookings.length) {
+            return callback(null, []);
+        }
+
+        const deleteSql = `
+            DELETE FROM bookings
+            WHERE TIMESTAMP(date, time) <= DATE_SUB(NOW(), INTERVAL 3 HOUR)
+        `;
+
+        db.query(deleteSql, deleteErr => {
+            if (deleteErr) {
+                return callback(deleteErr);
+            }
+
+            expiredBookings.forEach(booking => {
+                broadcastBookingChange("expired", { booking });
+            });
+
+            callback(null, expiredBookings);
+        });
+    });
+}
+
+function getBookings(_, res) {
+    cleanupExpiredBookings(cleanupErr => {
+        if (cleanupErr) {
+            console.error("Cleanup Error:", cleanupErr);
+            return res.status(500).json({ error: "ไม่สามารถล้างรายการที่หมดเวลาได้" });
+        }
+
+        const sql = "SELECT * FROM bookings ORDER BY id DESC";
+        db.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).json({ error: "ไม่สามารถดึงข้อมูลการจองได้" });
+            }
+            res.json(results);
+        });
     });
 }
 
