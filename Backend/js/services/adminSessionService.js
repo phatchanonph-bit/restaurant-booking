@@ -1,8 +1,10 @@
+// จัดการ session ของแอดมินแบบง่าย ๆ เก็บไว้ใน memory ของ server
 const crypto = require("crypto");
 
 const ADMIN_SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 const adminSessions = new Map();
 
+// สร้าง token ใหม่หลังล็อกอินสำเร็จ
 function createAdminSession(admin) {
     pruneExpiredAdminSessions();
 
@@ -22,6 +24,7 @@ function createAdminSession(admin) {
     };
 }
 
+// ลบ session ที่หมดอายุออก เพื่อไม่ให้เก็บค้างใน memory
 function pruneExpiredAdminSessions() {
     const now = Date.now();
 
@@ -32,11 +35,13 @@ function pruneExpiredAdminSessions() {
     }
 }
 
+// ดึงข้อมูล session จาก token ที่แนบมากับ request
 function getAdminSession(token) {
     pruneExpiredAdminSessions();
     return adminSessions.get(token) || null;
 }
 
+// ใช้ตอน logout เพื่อลบ token นั้นออกจากระบบ
 function deleteAdminSession(token) {
     adminSessions.delete(token);
 }

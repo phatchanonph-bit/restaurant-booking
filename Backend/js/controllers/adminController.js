@@ -1,3 +1,4 @@
+// controller ฝั่งแอดมิน: ล็อกอิน, ออกจากระบบ, เปลี่ยนสถานะ booking และลบ booking
 const db = require("../config/db");
 const { broadcastBookingChange } = require("../services/realtime");
 const {
@@ -5,6 +6,7 @@ const {
     deleteAdminSession
 } = require("../services/adminSessionService");
 
+// ล็อกอินโดยตรวจ username/password จากตาราง admins
 function login(req, res) {
     const { username, password } = req.body;
 
@@ -44,6 +46,7 @@ function login(req, res) {
     });
 }
 
+// ใช้ตรวจว่าแอดมินที่ล็อกอินอยู่ยังมีสิทธิ์ใช้งาน token นี้หรือไม่
 function verify(req, res) {
     res.json({
         ok: true,
@@ -51,11 +54,13 @@ function verify(req, res) {
     });
 }
 
+// ออกจากระบบโดยลบ token ปัจจุบันออกจาก session store
 function logout(req, res) {
     deleteAdminSession(req.adminToken);
     res.json({ message: "ออกจากระบบสำเร็จ" });
 }
 
+// เปลี่ยนสถานะ booking และแจ้งหน้า admin/client ผ่าน realtime
 function updateStatus(req, res) {
     const { id, status, table_number } = req.body;
 
@@ -98,6 +103,7 @@ function updateStatus(req, res) {
     });
 }
 
+// ลบ booking ออกจากฐานข้อมูลและ broadcast ให้หน้าอื่นอัปเดตตาม
 function deleteBooking(req, res) {
     const bookingId = req.params.id;
     const getCurrentSql = "SELECT * FROM bookings WHERE id = ? LIMIT 1";

@@ -8,8 +8,36 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: restaurant
+      MYSQL_ROOT_HOST: "%"
     ports:
       - "3307:3306"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/init:/docker-entrypoint-initdb.d
+
+  backend:
+    image: node:20-alpine
+    container_name: restaurant_backend
+    restart: always
+    working_dir: /app
+    command: sh -c "npm install && npm start"
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: 1234
+      DB_NAME: restaurant
+      RESET_BOOKINGS_ON_START: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -22,3 +50,7 @@ services:
       - "8080:80"
     depends_on:
       - db
+      - backend
+
+volumes:
+  mysql_data:

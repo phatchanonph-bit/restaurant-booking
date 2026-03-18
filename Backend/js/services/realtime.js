@@ -1,10 +1,13 @@
+// จัดการ realtime แบบ Server-Sent Events เพื่อแจ้งการเปลี่ยนแปลง booking ไปยังหน้าเว็บ
 const clients = new Set();
 
+// ส่ง event หนึ่งก้อนไปยัง client ที่เชื่อมต่ออยู่
 function sendEvent(client, eventName, payload) {
     client.write(`event: ${eventName}\n`);
     client.write(`data: ${JSON.stringify(payload)}\n\n`);
 }
 
+// broadcast การเปลี่ยนแปลง booking ไปยังทุก client ที่กำลังฟังอยู่
 function broadcastBookingChange(action, payload = {}) {
     const eventPayload = {
         action,
@@ -17,6 +20,7 @@ function broadcastBookingChange(action, payload = {}) {
     }
 }
 
+// เปิดการเชื่อมต่อ SSE และคอยเก็บ client ไว้สำหรับส่ง event ในภายหลัง
 function handleEvents(req, res) {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");

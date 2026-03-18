@@ -4,6 +4,8 @@
   "description": "",
   "main": "js/server.js",
   "scripts": {
+    "dev": "node --watch js/server.js",
+    "dev:nodemon": "nodemon js/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node js/server.js"
   },

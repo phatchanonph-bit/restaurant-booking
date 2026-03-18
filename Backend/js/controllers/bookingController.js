@@ -1,8 +1,11 @@
+// controller ฝั่ง booking: ดูโต๊ะว่าง, สร้าง booking, และดึงรายการจองให้แอดมิน
 const db = require("../config/db");
 const { broadcastBookingChange } = require("../services/realtime");
 
+// หนึ่งรอบจองใช้เวลา 3 ชั่วโมง
 const BOOKING_DURATION = "03:00:00";
 
+// ลบรายการที่หมดเวลาแล้วออกจากระบบ ก่อนส่งข้อมูลใหม่ให้หน้า admin
 function cleanupExpiredBookings(callback = () => {}) {
     const findExpiredSql = `
         SELECT *
@@ -38,6 +41,7 @@ function cleanupExpiredBookings(callback = () => {}) {
     });
 }
 
+// ส่งรายการจองทั้งหมดให้หน้าแอดมิน โดยเคลียร์รายการหมดเวลาก่อน
 function getBookings(_, res) {
     cleanupExpiredBookings(cleanupErr => {
         if (cleanupErr) {
@@ -56,6 +60,7 @@ function getBookings(_, res) {
     });
 }
 
+// เช็กว่าในวันและเวลาที่เลือก มีโต๊ะไหนติดจองช่วงเวลาเดียวกันอยู่แล้วบ้าง
 function getAvailability(req, res) {
     const { date, time } = req.query;
 
@@ -87,6 +92,7 @@ function getAvailability(req, res) {
     });
 }
 
+// สร้างรายการจองใหม่หลังจากตรวจข้อมูลและตรวจเวลาซ้ำของโต๊ะแล้ว
 function createBooking(req, res) {
     const { name, phone, people, date, time, table_number } = req.body;
 
