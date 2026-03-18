@@ -181,7 +181,7 @@
 </head>
 <body>
     <script>
-        if (localStorage.getItem('restaurant_admin_access') !== 'granted') {
+        if (!localStorage.getItem('restaurant_admin_token')) {
             window.location.href = 'admin-login.html';
         }
     </script>
@@ -242,7 +242,8 @@
     </div>
 
     <script>
-        const ADMIN_ACCESS_KEY = 'restaurant_admin_access';
+        const ADMIN_TOKEN_KEY = 'restaurant_admin_token';
+        const ADMIN_USER_KEY = 'restaurant_admin_user';
         const API_URL = "http://localhost:3000";
         const pendingTableBody = document.getElementById('booking-list');
         const approvedTableBody = document.getElementById('approved-booking-list');
@@ -251,6 +252,30 @@
         const liveStatus = document.getElementById('live-status');
         const lastUpdate = document.getElementById('last-update');
         const logoutButton = document.getElementById('logout-button');
+        const adminToken = localStorage.getItem(ADMIN_TOKEN_KEY);
+
+        function getAdminHeaders(extraHeaders = {}) {
+            return {
+                ...extraHeaders,
+                Authorization: `Bearer ${adminToken}`
+            };
+        }
+
+        async function verifyAdminSession() {
+            try {
+                const response = await fetch(`${API_URL}/admin/verify`, {
+                    headers: getAdminHeaders()
+                });
+
+                if (!response.ok) {
+                    throw new Error('เซสชันหมดอายุ');
+                }
+            } catch (error) {
+                localStorage.removeItem(ADMIN_TOKEN_KEY);
+                localStorage.removeItem(ADMIN_USER_KEY);
+                window.location.href = 'admin-login.html';
+            }
+        }
 
         function setLastUpdate() {
             lastUpdate.textContent = `อัปเดตล่าสุด: ${new Date().toLocaleString('th-TH')}`;
@@ -344,8 +369,14 @@
 
         async function loadBookings() {
             try {
-                const res = await fetch(`${API_URL}/admin/bookings`);
+                const res = await fetch(`${API_URL}/admin/bookings`, {
+                    headers: getAdminHeaders()
+                });
                 const data = await res.json();
+
+                if (res.status === 401) {
+                    throw new Error('unauthorized');
+                }
 
                 if (!Array.isArray(data)) {
                     throw new Error('รูปแบบข้อมูลไม่ถูกต้อง');
@@ -370,6 +401,12 @@
                 setLastUpdate();
             } catch (err) {
                 console.error("Fetch Error:", err);
+                if (err.message === 'unauthorized') {
+                    localStorage.removeItem(ADMIN_TOKEN_KEY);
+                    localStorage.removeItem(ADMIN_USER_KEY);
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
                 liveStatus.textContent = 'Realtime: โหลดข้อมูลไม่สำเร็จ';
             }
         }
@@ -378,14 +415,24 @@
             try {
                 const response = await fetch(`${API_URL}/admin/update-status`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: getAdminHeaders({ "Content-Type": "application/json" }),
                     body: JSON.stringify({ id, status: newStatus })
                 });
+
+                if (response.status === 401) {
+                    throw new Error('เซสชันหมดอายุ');
+                }
 
                 if (!response.ok) {
                     throw new Error('อัปเดตสถานะไม่สำเร็จ');
                 }
             } catch (err) {
+                if (err.message === 'เซสชันหมดอายุ') {
+                    localStorage.removeItem(ADMIN_TOKEN_KEY);
+                    localStorage.removeItem(ADMIN_USER_KEY);
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
                 alert("ไม่สามารถอัปเดตสถานะได้");
             }
         }
@@ -404,12 +451,25 @@
             }
 
             try {
-                const response = await fetch(`${API_URL}/admin/delete/${id}`, { method: "DELETE" });
+                const response = await fetch(`${API_URL}/admin/delete/${id}`, {
+                    method: "DELETE",
+                    headers: getAdminHeaders()
+                });
+                
+                if (response.status === 401) {
+                    throw new Error('เซสชันหมดอายุ');
+                }
 
                 if (!response.ok) {
                     throw new Error('ลบข้อมูลไม่สำเร็จ');
                 }
             } catch (err) {
+                if (err.message === 'เซสชันหมดอายุ') {
+                    localStorage.removeItem(ADMIN_TOKEN_KEY);
+                    localStorage.removeItem(ADMIN_USER_KEY);
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
                 alert("ไม่สามารถลบข้อมูลได้");
             }
         }
@@ -429,8 +489,18 @@
             liveStatus.textContent = 'Realtime: หลุดการเชื่อมต่อ กำลังเชื่อมต่อใหม่...';
         };
 
-        logoutButton.addEventListener('click', () => {
-            localStorage.removeItem(ADMIN_ACCESS_KEY);
+        logoutButton.addEventListener('click', async () => {
+            try {
+                await fetch(`${API_URL}/admin/logout`, {
+                    method: 'POST',
+                    headers: getAdminHeaders()
+                });
+            } catch (error) {
+                console.error('Logout Error:', error);
+            }
+
+            localStorage.removeItem(ADMIN_TOKEN_KEY);
+            localStorage.removeItem(ADMIN_USER_KEY);
             window.location.href = 'admin-login.html';
         });
 
@@ -441,7 +511,10 @@
             eventSource.close();
         });
 
-        window.onload = loadBookings;
+        window.onload = async () => {
+            await verifyAdminSession();
+            await loadBookings();
+        };
     </script>
 </body>
 </html>

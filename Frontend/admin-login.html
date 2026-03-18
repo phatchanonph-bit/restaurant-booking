@@ -15,7 +15,6 @@
             --muted: #75635d;
             --brand: #8f2232;
             --brand-dark: #681826;
-            --accent: #f0b457;
             --border: rgba(104, 24, 38, 0.12);
             --shadow: 0 24px 60px rgba(68, 25, 22, 0.16);
         }
@@ -79,7 +78,7 @@
             color: var(--brand-dark);
         }
 
-        .password-input {
+        .login-input {
             width: 100%;
             min-height: 54px;
             padding: 0 16px;
@@ -89,16 +88,17 @@
             font-size: 1rem;
             font-family: 'Noto Sans Thai', sans-serif;
             outline: none;
+            margin-bottom: 14px;
         }
 
-        .password-input:focus {
+        .login-input:focus {
             border-color: rgba(143, 34, 50, 0.4);
             box-shadow: 0 0 0 4px rgba(143, 34, 50, 0.08);
         }
 
         .error-message {
             min-height: 22px;
-            margin-top: 10px;
+            margin-top: 2px;
             color: #c23b4d;
             font-size: 0.92rem;
             font-weight: 700;
@@ -132,6 +132,11 @@
             font-size: 1rem;
         }
 
+        .btn-login:disabled {
+            opacity: 0.72;
+            cursor: wait;
+        }
+
         .back-link {
             color: var(--muted);
             background: rgba(255, 255, 255, 0.6);
@@ -143,44 +148,98 @@
     <div class="login-card">
         <div class="badge">Admin Access</div>
         <h1>เข้าสู่ระบบแอดมิน</h1>
-        <p class="subtitle">ใส่รหัสผ่านก่อนเข้าหน้าจัดการคิวจอง เพื่อป้องกันไม่ให้ลูกค้าเข้าถึงเมนูแอดมินได้โดยตรง</p>
+        <p class="subtitle">ล็อกอินด้วยข้อมูลจากฐานข้อมูล `admins` เพื่อเข้าหน้าจัดการคิวจอง</p>
 
         <form id="login-form">
+            <label class="field-label" for="admin-username">ชื่อผู้ใช้</label>
+            <input id="admin-username" class="login-input" type="text" placeholder="กรอก username" autocomplete="username" required>
+
             <label class="field-label" for="admin-password">รหัสผ่านแอดมิน</label>
-            <input id="admin-password" class="password-input" type="password" placeholder="กรอกรหัสผ่าน" autocomplete="current-password" required>
+            <input id="admin-password" class="login-input" type="password" placeholder="กรอกรหัสผ่าน" autocomplete="current-password" required>
+
             <div id="error-message" class="error-message"></div>
 
             <div class="actions">
-                <button type="submit" class="btn-login">เข้าสู่หน้าแอดมิน</button>
+                <button id="login-button" type="submit" class="btn-login">เข้าสู่หน้าแอดมิน</button>
                 <a href="index.html" class="back-link">← กลับไปหน้าหลัก</a>
             </div>
         </form>
     </div>
 
     <script>
-        const ADMIN_PASSWORD = '123456';
-        const ADMIN_ACCESS_KEY = 'restaurant_admin_access';
+        const API_URL = "http://localhost:3000";
+        const ADMIN_TOKEN_KEY = 'restaurant_admin_token';
+        const ADMIN_USER_KEY = 'restaurant_admin_user';
         const adminForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('admin-username');
         const passwordInput = document.getElementById('admin-password');
+        const loginButton = document.getElementById('login-button');
         const errorMessage = document.getElementById('error-message');
 
-        if (localStorage.getItem(ADMIN_ACCESS_KEY) === 'granted') {
-            window.location.href = 'admin.html';
-        }
+        async function verifyExistingLogin() {
+            const token = localStorage.getItem(ADMIN_TOKEN_KEY);
 
-        adminForm.addEventListener('submit', event => {
-            event.preventDefault();
-
-            if (passwordInput.value !== ADMIN_PASSWORD) {
-                errorMessage.textContent = 'รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่';
-                passwordInput.focus();
-                passwordInput.select();
+            if (!token) {
                 return;
             }
 
-            localStorage.setItem(ADMIN_ACCESS_KEY, 'granted');
-            window.location.href = 'admin.html';
+            try {
+                const response = await fetch(`${API_URL}/admin/verify`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    window.location.href = 'admin.html';
+                    return;
+                }
+            } catch (error) {
+                console.error('Verify Login Error:', error);
+            }
+
+            localStorage.removeItem(ADMIN_TOKEN_KEY);
+            localStorage.removeItem(ADMIN_USER_KEY);
+        }
+
+        adminForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            errorMessage.textContent = '';
+            loginButton.disabled = true;
+            loginButton.textContent = 'กำลังตรวจสอบ...';
+
+            try {
+                const response = await fetch(`${API_URL}/admin/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: usernameInput.value.trim(),
+                        password: passwordInput.value
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'ไม่สามารถเข้าสู่ระบบได้');
+                }
+
+                localStorage.setItem(ADMIN_TOKEN_KEY, result.token);
+                localStorage.setItem(ADMIN_USER_KEY, result.admin.username);
+                window.location.href = 'admin.html';
+            } catch (error) {
+                errorMessage.textContent = error.message || 'เข้าสู่ระบบไม่สำเร็จ';
+                passwordInput.focus();
+                passwordInput.select();
+            } finally {
+                loginButton.disabled = false;
+                loginButton.textContent = 'เข้าสู่หน้าแอดมิน';
+            }
         });
+
+        verifyExistingLogin();
     </script>
 </body>
 </html>

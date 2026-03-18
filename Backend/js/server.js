@@ -2,10 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
 const http = require("http");
+const crypto = require("crypto");
 
 const app = express();
 const server = http.createServer(app);
 const BOOKING_DURATION = "03:00:00";
+const ADMIN_SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 
 app.use(cors());
 app.use(express.json());
@@ -20,6 +22,71 @@ const db = mysql.createConnection({
 });
 
 const clients = new Set();
+const adminSessions = new Map();
+
+function hashAdminPassword(password) {
+    const salt = crypto.randomBytes(16).toString("hex");
+    const hashedPassword = crypto.scryptSync(password, salt, 64).toString("hex");
+    return `scrypt$${salt}$${hashedPassword}`;
+}
+
+function verifyAdminPassword(inputPassword, storedPassword) {
+    if (!storedPassword) {
+        return { isValid: false, needsUpgrade: false };
+    }
+
+    if (!storedPassword.startsWith("scrypt$")) {
+        return {
+            isValid: storedPassword === inputPassword,
+            needsUpgrade: storedPassword === inputPassword
+        };
+    }
+
+    const [, salt, savedHash] = storedPassword.split("$");
+
+    if (!salt || !savedHash) {
+        return { isValid: false, needsUpgrade: false };
+    }
+
+    const inputHash = crypto.scryptSync(inputPassword, salt, 64).toString("hex");
+
+    return {
+        isValid: crypto.timingSafeEqual(Buffer.from(savedHash, "hex"), Buffer.from(inputHash, "hex")),
+        needsUpgrade: false
+    };
+}
+
+function pruneExpiredAdminSessions() {
+    const now = Date.now();
+
+    for (const [token, session] of adminSessions.entries()) {
+        if ((session.expiresAt || 0) <= now) {
+            adminSessions.delete(token);
+        }
+    }
+}
+
+function extractAdminToken(req) {
+    const authorizationHeader = req.headers.authorization || "";
+
+    if (!authorizationHeader.startsWith("Bearer ")) {
+        return null;
+    }
+
+    return authorizationHeader.slice(7).trim();
+}
+
+function requireAdminAuth(req, res, next) {
+    pruneExpiredAdminSessions();
+    const token = extractAdminToken(req);
+
+    if (!token || !adminSessions.has(token)) {
+        return res.status(401).json({ error: "กรุณาเข้าสู่ระบบแอดมินก่อน" });
+    }
+
+    req.admin = adminSessions.get(token);
+    next();
+}
 
 function sendEvent(client, eventName, payload) {
     client.write(`event: ${eventName}\n`);
@@ -210,9 +277,88 @@ app.post("/book", (req, res) => {
     });
 });
 
-app.get("/admin/bookings", getBookings);
+app.post("/admin/login", (req, res) => {
+    const { username, password } = req.body;
 
-app.post("/admin/update-status", (req, res) => {
+    if (!username || !password) {
+        return res.status(400).json({ error: "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน" });
+    }
+
+    const sql = "SELECT id, username, password FROM admins WHERE username = ? LIMIT 1";
+
+    db.query(sql, [username], (err, rows) => {
+        if (err) {
+            console.error("Admin Login Error:", err);
+            return res.status(500).json({ error: "ไม่สามารถตรวจสอบข้อมูลแอดมินได้" });
+        }
+
+        if (rows.length === 0) {
+            return res.status(401).json({ error: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
+        }
+
+        const admin = rows[0];
+        const passwordCheck = verifyAdminPassword(password, admin.password);
+
+        if (!passwordCheck.isValid) {
+            return res.status(401).json({ error: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
+        }
+
+        const token = crypto.randomBytes(24).toString("hex");
+        const expiresAt = Date.now() + ADMIN_SESSION_TTL_MS;
+
+        adminSessions.set(token, {
+            id: admin.id,
+            username: admin.username,
+            loginAt: Date.now(),
+            expiresAt
+        });
+
+        const finishLogin = () => {
+            res.json({
+                message: "เข้าสู่ระบบสำเร็จ",
+                token,
+                expiresAt,
+                admin: {
+                    id: admin.id,
+                    username: admin.username
+                }
+            });
+        };
+
+        if (!passwordCheck.needsUpgrade) {
+            finishLogin();
+            return;
+        }
+
+        const upgradedPassword = hashAdminPassword(password);
+        const upgradeSql = "UPDATE admins SET password = ? WHERE id = ?";
+
+        db.query(upgradeSql, [upgradedPassword, admin.id], upgradeErr => {
+            if (upgradeErr) {
+                console.error("Admin Password Upgrade Error:", upgradeErr);
+            }
+
+            finishLogin();
+        });
+    });
+});
+
+app.get("/admin/verify", requireAdminAuth, (req, res) => {
+    res.json({
+        ok: true,
+        admin: req.admin
+    });
+});
+
+app.post("/admin/logout", requireAdminAuth, (req, res) => {
+    const token = extractAdminToken(req);
+    adminSessions.delete(token);
+    res.json({ message: "ออกจากระบบสำเร็จ" });
+});
+
+app.get("/admin/bookings", requireAdminAuth, getBookings);
+
+app.post("/admin/update-status", requireAdminAuth, (req, res) => {
     const { id, status, table_number } = req.body;
 
     if (!id || !status) {
@@ -254,7 +400,7 @@ app.post("/admin/update-status", (req, res) => {
     });
 });
 
-app.delete("/admin/delete/:id", (req, res) => {
+app.delete("/admin/delete/:id", requireAdminAuth, (req, res) => {
     const bookingId = req.params.id;
     const getCurrentSql = "SELECT * FROM bookings WHERE id = ? LIMIT 1";
 
