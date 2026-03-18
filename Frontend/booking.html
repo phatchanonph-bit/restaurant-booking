@@ -9,7 +9,9 @@
 </head>
 <body>
     <div class="booking-container">
+        <div class="page-badge">Booking Form</div>
         <h1>จองโต๊ะร้านอาหาร</h1>
+        <p class="form-intro">กรอกข้อมูลให้ครบเพื่อเลือกรอบเวลาและโต๊ะที่เหมาะกับการจองของคุณ</p>
 
         <form id="bookingForm" onsubmit="goToSelectSeat(event)">
             <div class="form-group">
@@ -37,6 +39,11 @@
                     <label for="time">เวลา</label>
                     <input type="time" id="time" required>
                 </div>
+            </div>
+
+            <div class="booking-note">
+                <span class="note-dot"></span>
+                รอบจอง 1 ครั้งใช้ได้ 3 ชั่วโมง
             </div>
 
             <button type="submit" class="btn-submit">ไปเลือกโต๊ะ →</button>

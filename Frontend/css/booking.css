@@ -1,97 +1,173 @@
 body {
     font-family: 'Noto Sans Thai', sans-serif;
-    background-color: #f4f4f9;
+    background-color: #f6f1ec;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    background-image: linear-gradient(rgba(244, 244, 249, 0.9), rgba(244, 244, 249, 0.9)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4');
+    padding: 24px;
+    background-image:
+        radial-gradient(circle at top left, rgba(217, 183, 136, 0.2), transparent 32%),
+        linear-gradient(rgba(246, 241, 236, 0.88), rgba(246, 241, 236, 0.9)),
+        url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4');
     background-size: cover;
     background-position: center;
 }
 
 .booking-container {
-    background-color: white;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.94);
+    padding: 36px 40px 28px;
+    border-radius: 24px;
+    box-shadow: 0 24px 60px rgba(83, 48, 32, 0.14);
+    border: 1px solid rgba(176, 58, 72, 0.08);
     width: 100%;
-    max-width: 450px;
+    max-width: 500px;
+    backdrop-filter: blur(8px);
+}
+
+.page-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #f8e7df;
+    color: #9a4a39;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 16px;
 }
 
 h1 {
     text-align: center;
-    color: #b03a48;
-    margin-bottom: 30px;
-    font-size: 28px;
+    color: #a53c4b;
+    margin: 0 0 10px;
+    font-size: 34px;
+    line-height: 1.2;
+}
+
+.form-intro {
+    text-align: center;
+    color: #74675f;
+    margin: 0 0 28px;
+    font-size: 15px;
+    line-height: 1.7;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
-    color: #444;
+    color: #42352f;
+    font-size: 15px;
 }
 
 input {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    padding: 14px 15px;
+    border: 1px solid #e5d9d0;
+    border-radius: 14px;
     box-sizing: border-box;
     font-family: 'Noto Sans Thai', sans-serif;
     font-size: 16px;
+    background: #fffdfb;
+    color: #332924;
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
 }
 
 input:focus {
     border-color: #b03a48;
     outline: none;
-    box-shadow: 0 0 5px rgba(176, 58, 72, 0.3);
+    box-shadow: 0 0 0 4px rgba(176, 58, 72, 0.12);
+    transform: translateY(-1px);
 }
 
 .row-group {
     display: flex;
-    gap: 15px;
+    gap: 16px;
 }
 
 .row-group .form-group {
     flex: 1;
 }
 
+.booking-note {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0 18px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: #fbf2eb;
+    color: #7c6358;
+    font-size: 14px;
+}
+
+.note-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #d39b5f;
+    flex-shrink: 0;
+}
+
 .btn-submit {
     width: 100%;
-    padding: 15px;
-    background-color: #b03a48;
+    padding: 16px;
+    background: linear-gradient(135deg, #b33d4d, #973546);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 16px;
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: transform 0.25s, box-shadow 0.25s, filter 0.25s;
     font-family: 'Noto Sans Thai', sans-serif;
     margin-top: 10px;
+    box-shadow: 0 16px 28px rgba(176, 58, 72, 0.22);
 }
 
 .btn-submit:hover {
-    background-color: #8a2d38;
+    transform: translateY(-2px);
+    filter: brightness(1.03);
 }
 
 .back-link {
     display: block;
     text-align: center;
-    margin-top: 20px;
-    color: #666;
+    margin-top: 22px;
+    color: #7a6c65;
     text-decoration: none;
     font-size: 14px;
+    transition: color 0.25s;
 }
 
 .back-link:hover {
     color: #b03a48;
-    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 16px;
+    }
+
+    .booking-container {
+        padding: 28px 22px 24px;
+        border-radius: 20px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    .row-group {
+        flex-direction: column;
+        gap: 0;
+    }
 }

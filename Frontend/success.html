@@ -9,11 +9,15 @@
 </head>
 <body>
     <div class="success-container">
-        <div class="success-icon">✔️</div>
+        <div class="success-icon-wrap">
+            <div class="success-icon">✓</div>
+        </div>
         <h1>จองโต๊ะสำเร็จ!</h1>
         <p class="subtitle">ขอบคุณที่เลือกใช้บริการร้านของเรา</p>
 
         <div class="details-box">
+            <div class="details-title">รายละเอียดการจอง</div>
+
             <div class="detail-item">
                 <span class="detail-label">ชื่อผู้จอง:</span>
                 <span class="detail-value" id="res-name">-</span>
@@ -34,11 +38,13 @@
                 <span class="detail-label">เวลา:</span>
                 <span class="detail-value" id="res-time">-</span>
             </div>
-            <div class="detail-item" style="margin-top: 15px;">
+            <div class="detail-item detail-item-table">
                 <span class="detail-label">โต๊ะที่เลือก:</span>
                 <span class="detail-value highlight" id="res-table">-</span>
             </div>
         </div>
+
+        <p class="success-note">กรุณาเก็บรายละเอียดนี้ไว้สำหรับใช้ยืนยันกับทางร้าน</p>
 
         <a href="index.html" class="btn-home">กลับสู่หน้าหลัก</a>
     </div>
