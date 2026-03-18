@@ -25,8 +25,23 @@
 
         h1 {
             color: #b03a48;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             text-align: center;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+            flex-wrap: wrap;
+        }
+
+        .live-indicator {
+            color: #1f7a3d;
+            font-weight: bold;
         }
 
         table {
@@ -46,7 +61,6 @@
             color: #b03a48;
         }
 
-        /* ปรับแต่งสถานะให้ดูง่าย */
         .status {
             padding: 6px 12px;
             border-radius: 20px;
@@ -55,9 +69,57 @@
             display: inline-block;
             min-width: 80px;
         }
+
         .status.pending { background-color: #fff3cd; color: #856404; }
         .status.approved { background-color: #d4edda; color: #155724; }
         .status.rejected { background-color: #f8d7da; color: #721c24; }
+
+        .table-pending {
+            color: #8a6d3b;
+            font-style: italic;
+        }
+
+        .slot-cell {
+            min-width: 170px;
+        }
+
+        .slot-date {
+            display: block;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .slot-time {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background-color: #fdf1d6;
+            color: #8a6d3b;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .table-summary {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .table-chip {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background-color: #fdf5f6;
+            color: #b03a48;
+            font-weight: bold;
+        }
+
+        .slot-hint {
+            font-size: 12px;
+            color: #777;
+        }
 
         .btn {
             padding: 8px 12px;
@@ -70,6 +132,7 @@
             margin: 2px;
             transition: 0.2s;
         }
+
         .btn-approve { background-color: #28a745; }
         .btn-reject { background-color: #dc3545; }
         .btn-delete { background-color: #6c757d; }
@@ -98,6 +161,10 @@
 
     <div class="admin-container">
         <h1>จัดการคิวจองโต๊ะ (Admin Panel)</h1>
+        <div class="status-row">
+            <div id="live-status" class="live-indicator">Realtime: กำลังเชื่อมต่อ...</div>
+            <div id="last-update">อัปเดตล่าสุด: -</div>
+        </div>
         
         <table>
             <thead>
@@ -106,14 +173,13 @@
                     <th>ชื่อผู้จอง</th>
                     <th>เบอร์โทร</th>
                     <th>จำนวน</th>
-                    <th>วันที่ - เวลา</th>
-                    <th>โต๊ะ</th>
+                    <th>รอบจอง</th>
+                    <th>โต๊ะ / รอบ</th>
                     <th>สถานะ</th>
                     <th>จัดการ</th>
                 </tr>
             </thead>
-            <tbody id="booking-list">
-                </tbody>
+            <tbody id="booking-list"></tbody>
         </table>
         
         <div id="no-data" class="empty-message" style="display: none;">ไม่มีรายการจองในระบบขณะนี้</div>
@@ -122,82 +188,150 @@
     </div>
 
     <script>
-        // เปลี่ยนเป็น URL ของ Backend ของคุณ (เช่น http://localhost:3000)
         const API_URL = "http://localhost:3000";
+        const tableBody = document.getElementById('booking-list');
+        const noDataMsg = document.getElementById('no-data');
+        const liveStatus = document.getElementById('live-status');
+        const lastUpdate = document.getElementById('last-update');
 
-        // ฟังก์ชันโหลดข้อมูลจาก Database
+        function setLastUpdate() {
+            lastUpdate.textContent = `อัปเดตล่าสุด: ${new Date().toLocaleString('th-TH')}`;
+        }
+
+        function getStatusClass(status) {
+            if (status === 'ยืนยันแล้ว') return 'approved';
+            if (status === 'ปฏิเสธแล้ว') return 'rejected';
+            return 'pending';
+        }
+
+        function formatBookingDate(dateValue) {
+            if (!dateValue) {
+                return '-';
+            }
+
+            if (typeof dateValue === 'string' && dateValue.includes('T')) {
+                return dateValue.slice(0, 10);
+            }
+
+            return dateValue;
+        }
+
+        function addHoursToTime(timeValue, hoursToAdd) {
+            if (!timeValue) {
+                return '-';
+            }
+
+            const [hours, minutes] = timeValue.split(':').map(Number);
+            const totalMinutes = (hours * 60) + minutes + (hoursToAdd * 60);
+            const normalizedMinutes = ((totalMinutes % 1440) + 1440) % 1440;
+            const nextHours = String(Math.floor(normalizedMinutes / 60)).padStart(2, '0');
+            const nextMinutes = String(normalizedMinutes % 60).padStart(2, '0');
+            return `${nextHours}:${nextMinutes}:00`;
+        }
+
         async function loadBookings() {
             try {
                 const res = await fetch(`${API_URL}/admin/bookings`);
                 const data = await res.json();
-                
-                const tableBody = document.getElementById('booking-list');
-                const noDataMsg = document.getElementById('no-data');
-                
+
                 tableBody.innerHTML = '';
 
-                if (data.length === 0) {
+                if (!Array.isArray(data) || data.length === 0) {
                     noDataMsg.style.display = 'block';
+                    setLastUpdate();
                     return;
                 }
 
                 noDataMsg.style.display = 'none';
-                data.forEach(book => {
-                    // กำหนดสีตามสถานะใน DB
-                    let statusClass = 'pending';
-                    if(book.status === 'ยืนยันแล้ว') statusClass = 'approved';
-                    if(book.status === 'ปฏิเสธแล้ว') statusClass = 'rejected';
 
+                data.forEach(book => {
+                    const statusClass = getStatusClass(book.status);
+                    const bookingDate = formatBookingDate(book.date);
+                    const bookingEndTime = addHoursToTime(book.time, 3);
+                    const tableDisplay = book.table_number
+                        ? `
+                            <div class="table-summary">
+                                <span class="table-chip">${book.table_number}</span>
+                                <span class="slot-hint">${bookingDate} ${book.time} - ${bookingEndTime}</span>
+                            </div>
+                        `
+                        : '<span class="table-pending">ยังไม่ได้เลือกโต๊ะ</span>';
                     const row = `
                         <tr>
                             <td>${book.id}</td>
                             <td>${book.name}</td>
                             <td>${book.phone}</td>
                             <td>${book.people} ท่าน</td>
-                            <td>${book.date}<br><small>${book.time}</small></td>
-                            <td><strong>${book.table_number || 'ไม่ระบุ'}</strong></td>
+                            <td class="slot-cell">
+                                <span class="slot-date">${bookingDate}</span>
+                                <span class="slot-time">${book.time} - ${bookingEndTime}</span>
+                            </td>
+                            <td>${tableDisplay}</td>
                             <td><span class="status ${statusClass}">${book.status || 'รอยืนยัน'}</span></td>
                             <td>
-                                <button class="btn btn-approve" onclick="updateStatus(${book.id}, 'ยืนยันแล้ว')">✔️ ยืนยัน</button>
-                                <button class="btn btn-reject" onclick="updateStatus(${book.id}, 'ปฏิเสธแล้ว')">❌ ปฏิเสธ</button>
+                                <button class="btn btn-approve" onclick="updateStatus(${book.id}, 'ยืนยันแล้ว')">ยืนยัน</button>
+                                <button class="btn btn-reject" onclick="updateStatus(${book.id}, 'ปฏิเสธแล้ว')">ปฏิเสธ</button>
                                 <button class="btn btn-delete" onclick="deleteBooking(${book.id})">ลบ</button>
                             </td>
                         </tr>
                     `;
                     tableBody.innerHTML += row;
                 });
+
+                setLastUpdate();
             } catch (err) {
                 console.error("Fetch Error:", err);
+                liveStatus.textContent = 'Realtime: โหลดข้อมูลไม่สำเร็จ';
             }
         }
 
-        // ฟังก์ชันอัปเดตสถานะ (บันทึกลง DB)
         async function updateStatus(id, newStatus) {
             try {
-                await fetch(`${API_URL}/admin/update-status`, {
+                const response = await fetch(`${API_URL}/admin/update-status`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id, status: newStatus })
                 });
-                loadBookings(); // รีเฟรชข้อมูล
+
+                if (!response.ok) {
+                    throw new Error('อัปเดตสถานะไม่สำเร็จ');
+                }
             } catch (err) {
                 alert("ไม่สามารถอัปเดตสถานะได้");
             }
         }
 
-        // ฟังก์ชันลบรายการ
         async function deleteBooking(id) {
-            if (confirm("ต้องการลบรายการจองที่ ID: " + id + " หรือไม่?")) {
-                try {
-                    await fetch(`${API_URL}/admin/delete/${id}`, { method: "DELETE" });
-                    loadBookings();
-                } catch (err) {
-                    alert("ไม่สามารถลบข้อมูลได้");
+            if (!confirm(`ต้องการลบรายการจอง ID: ${id} หรือไม่?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/admin/delete/${id}`, { method: "DELETE" });
+
+                if (!response.ok) {
+                    throw new Error('ลบข้อมูลไม่สำเร็จ');
                 }
+            } catch (err) {
+                alert("ไม่สามารถลบข้อมูลได้");
             }
         }
 
-        // โหลดข้อมูลทันทีที่เปิดหน้า
+        const eventSource = new EventSource(`${API_URL}/events`);
+
+        eventSource.addEventListener('connected', () => {
+            liveStatus.textContent = 'Realtime: เชื่อมต่อแล้ว';
+        });
+
+        eventSource.addEventListener('booking-change', () => {
+            liveStatus.textContent = 'Realtime: เชื่อมต่อแล้ว';
+            loadBookings();
+        });
+
+        eventSource.onerror = () => {
+            liveStatus.textContent = 'Realtime: หลุดการเชื่อมต่อ กำลังเชื่อมต่อใหม่...';
+        };
+
         window.onload = loadBookings;
     </script>
 </body>
