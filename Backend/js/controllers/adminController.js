@@ -1,4 +1,4 @@
-// controller ฝั่งแอดมิน: ล็อกอิน, ออกจากระบบ, เปลี่ยนสถานะ booking และลบ booking
+// controller ฝั่งแอดมิน: ล็อกอิน ออกจากระบบ เปลี่ยนสถานะ booking และลบ booking
 const db = require("../config/db");
 const { broadcastBookingChange } = require("../services/realtime");
 const {
@@ -46,17 +46,24 @@ function login(req, res) {
     });
 }
 
-// ใช้ตรวจว่าแอดมินที่ล็อกอินอยู่ยังมีสิทธิ์ใช้งาน token นี้หรือไม่
-function verify(req, res) {
+// เมื่อไม่ใช้ middleware แล้ว route นี้ตอบกลับว่าเข้าถึงได้ตามปกติ
+function verify(_req, res) {
     res.json({
-        ok: true,
-        admin: req.admin
+        ok: true
     });
 }
 
-// ออกจากระบบโดยลบ token ปัจจุบันออกจาก session store
+// ออกจากระบบแบบไม่บังคับตรวจ token
 function logout(req, res) {
-    deleteAdminSession(req.adminToken);
+    const authorizationHeader = req.headers.authorization || "";
+    const token = authorizationHeader.startsWith("Bearer ")
+        ? authorizationHeader.slice(7).trim()
+        : null;
+
+    if (token) {
+        deleteAdminSession(token);
+    }
+
     res.json({ message: "ออกจากระบบสำเร็จ" });
 }
 

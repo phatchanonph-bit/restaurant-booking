@@ -3,21 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เลือกโต๊ะ - My Restaurant</title>
+    <title>เลือกโต๊ะ</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/select-seat.css">
 </head>
 <body>
-    <div class="shell">
+    <main class="shell">
         <aside class="info-panel">
-            <div class="panel-badge">Table Reservation</div>
-            <h2>เลือกโต๊ะที่เหมาะกับช่วงเวลาของคุณ</h2>
-            <p>
-                หน้านี้จะแสดงสถานะโต๊ะแบบอัปเดตอัตโนมัติในช่วงเวลา 3 ชั่วโมงของรอบที่คุณเลือก
-                เพื่อให้คุณตัดสินใจได้ง่ายและลดการชนกันของการจอง
-            </p>
+            <p class="panel-badge">Booking Summary</p>
+            <h2>ตรวจสอบข้อมูลก่อนยืนยันโต๊ะ</h2>
+            <p>หน้าเว็บนี้จะแสดงข้อมูลการจองและสถานะโต๊ะที่สามารถเลือกได้</p>
 
             <div class="summary-card">
                 <span class="summary-title">สรุปรายการจอง</span>
@@ -30,28 +27,28 @@
                     <strong id="summary-phone">-</strong>
                 </div>
                 <div class="summary-row">
-                    <span>จำนวนผู้ใช้บริการ</span>
+                    <span>จำนวนคน</span>
                     <strong id="summary-people">-</strong>
                 </div>
                 <div class="summary-row">
-                    <span>วันที่และเวลา</span>
+                    <span>วันและเวลา</span>
                     <strong id="summary-slot">-</strong>
                 </div>
             </div>
 
             <div class="tips">
-                <strong>คำแนะนำสั้น ๆ</strong>
-                <p>ถ้าโต๊ะที่ต้องการขึ้นสถานะถูกจองแล้ว คุณยังสามารถเลือกโต๊ะอื่นได้ทันทีโดยไม่ต้องย้อนกลับไปกรอกข้อมูลใหม่</p>
+                <strong>คำอธิบายสถานะ</strong>
+                <p>สีปกติคือโต๊ะว่าง, สีฟ้าคือโต๊ะที่เลือก, สีเทาคือโต๊ะที่จองแล้ว</p>
             </div>
         </aside>
 
         <section class="seat-container">
             <div class="top-bar">
                 <div class="title-wrap">
-                    <h1>เลือกโต๊ะของคุณ</h1>
-                    <p class="subtitle">เลือกโต๊ะที่ต้องการแล้วกดยืนยัน ระบบจะเช็กสถานะล่าสุดก่อนบันทึกทุกครั้ง</p>
+                    <h1>เลือกโต๊ะที่ต้องการ</h1>
+                    <p class="subtitle">คลิกเลือกโต๊ะ 1 โต๊ะ จากนั้นกดยืนยันการจอง</p>
                 </div>
-                <div class="live-chip">Realtime Active</div>
+                <div class="live-chip">Realtime</div>
             </div>
 
             <div class="booking-banner">
@@ -60,109 +57,29 @@
             </div>
 
             <div class="legend">
-                <div class="legend-item"><div class="color-box avail"></div> ว่างพร้อมจอง</div>
+                <div class="legend-item"><div class="color-box avail"></div> โต๊ะว่าง</div>
                 <div class="legend-item"><div class="color-box sel"></div> โต๊ะที่เลือก</div>
-                <div class="legend-item"><div class="color-box busy"></div> ติดรอบจองแล้ว</div>
+                <div class="legend-item"><div class="color-box busy"></div> โต๊ะไม่ว่าง</div>
             </div>
 
             <div class="floor-plan">
-                <div class="table-box" data-table="โต๊ะ 1">
-                    <svg class="table-icon" viewBox="0 0 100 100" aria-hidden="true">
-                        <path d="M 40 15 Q 50 5 60 15" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <path d="M 40 85 Q 50 95 60 85" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" stroke-width="5"/>
-                    </svg>
-                    <div class="table-name">โต๊ะ 1</div>
-                    <div class="table-meta">รองรับรอบนี้</div>
-                </div>
-
-                <div class="table-box" data-table="โต๊ะ 2">
-                    <svg class="table-icon" viewBox="0 0 100 100" aria-hidden="true">
-                        <path d="M 40 15 Q 50 5 60 15" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <path d="M 40 85 Q 50 95 60 85" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" stroke-width="5"/>
-                    </svg>
-                    <div class="table-name">โต๊ะ 2</div>
-                    <div class="table-meta">รองรับรอบนี้</div>
-                </div>
-
-                <div class="table-box" data-table="โต๊ะ 3">
-                    <svg class="table-icon" viewBox="0 0 100 100" aria-hidden="true">
-                        <path d="M 40 15 Q 50 5 60 15" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <path d="M 40 85 Q 50 95 60 85" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" stroke-width="5"/>
-                    </svg>
-                    <div class="table-name">โต๊ะ 3</div>
-                    <div class="table-meta">รองรับรอบนี้</div>
-                </div>
-
-                <div class="table-box" data-table="โต๊ะ 4">
-                    <svg class="table-icon" viewBox="0 0 100 100" aria-hidden="true">
-                        <path d="M 40 15 Q 50 5 60 15" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <path d="M 40 85 Q 50 95 60 85" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" stroke-width="5"/>
-                    </svg>
-                    <div class="table-name">โต๊ะ 4</div>
-                    <div class="table-meta">รองรับรอบนี้</div>
-                </div>
-
-                <div class="table-box" data-table="โต๊ะ 5">
-                    <svg class="table-icon" viewBox="0 0 100 100" aria-hidden="true">
-                        <path d="M 40 15 Q 50 5 60 15" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <path d="M 40 85 Q 50 95 60 85" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" stroke-width="5"/>
-                    </svg>
-                    <div class="table-name">โต๊ะ 5</div>
-                    <div class="table-meta">รองรับรอบนี้</div>
-                </div>
-
-                <div class="table-box" data-table="โต๊ะ 6">
-                    <svg class="table-icon" viewBox="0 0 100 100" aria-hidden="true">
-                        <path d="M 40 15 Q 50 5 60 15" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <path d="M 40 85 Q 50 95 60 85" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" stroke-width="5"/>
-                    </svg>
-                    <div class="table-name">โต๊ะ 6</div>
-                    <div class="table-meta">รองรับรอบนี้</div>
-                </div>
-
-                <div class="table-box" data-table="โต๊ะ 7">
-                    <svg class="table-icon" viewBox="0 0 100 100" aria-hidden="true">
-                        <path d="M 40 15 Q 50 5 60 15" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <path d="M 40 85 Q 50 95 60 85" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" stroke-width="5"/>
-                    </svg>
-                    <div class="table-name">โต๊ะ 7</div>
-                    <div class="table-meta">รองรับรอบนี้</div>
-                </div>
-
-                <div class="table-box" data-table="โต๊ะ 8">
-                    <svg class="table-icon" viewBox="0 0 100 100" aria-hidden="true">
-                        <path d="M 40 15 Q 50 5 60 15" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <path d="M 40 85 Q 50 95 60 85" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" stroke-width="5"/>
-                    </svg>
-                    <div class="table-name">โต๊ะ 8</div>
-                    <div class="table-meta">รองรับรอบนี้</div>
-                </div>
-
-                <div class="table-box" data-table="โต๊ะ 9">
-                    <svg class="table-icon" viewBox="0 0 100 100" aria-hidden="true">
-                        <path d="M 40 15 Q 50 5 60 15" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <path d="M 40 85 Q 50 95 60 85" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                        <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" stroke-width="5"/>
-                    </svg>
-                    <div class="table-name">โต๊ะ 9</div>
-                    <div class="table-meta">รองรับรอบนี้</div>
-                </div>
+                <div class="table-box" data-table="โต๊ะ 1"><div class="table-name">โต๊ะ 1</div><div class="table-meta">สำหรับลูกค้า</div></div>
+                <div class="table-box" data-table="โต๊ะ 2"><div class="table-name">โต๊ะ 2</div><div class="table-meta">สำหรับลูกค้า</div></div>
+                <div class="table-box" data-table="โต๊ะ 3"><div class="table-name">โต๊ะ 3</div><div class="table-meta">สำหรับลูกค้า</div></div>
+                <div class="table-box" data-table="โต๊ะ 4"><div class="table-name">โต๊ะ 4</div><div class="table-meta">สำหรับลูกค้า</div></div>
+                <div class="table-box" data-table="โต๊ะ 5"><div class="table-name">โต๊ะ 5</div><div class="table-meta">สำหรับลูกค้า</div></div>
+                <div class="table-box" data-table="โต๊ะ 6"><div class="table-name">โต๊ะ 6</div><div class="table-meta">สำหรับลูกค้า</div></div>
+                <div class="table-box" data-table="โต๊ะ 7"><div class="table-name">โต๊ะ 7</div><div class="table-meta">สำหรับลูกค้า</div></div>
+                <div class="table-box" data-table="โต๊ะ 8"><div class="table-name">โต๊ะ 8</div><div class="table-meta">สำหรับลูกค้า</div></div>
+                <div class="table-box" data-table="โต๊ะ 9"><div class="table-name">โต๊ะ 9</div><div class="table-meta">สำหรับลูกค้า</div></div>
             </div>
 
             <div class="actions">
                 <button id="confirm-button" class="btn-submit" onclick="confirmSeat()">ยืนยันที่นั่ง</button>
-                <a href="booking.html" class="back-link">← กลับไปแก้ไขข้อมูล</a>
+                <a href="booking.html" class="back-link">กลับไปแก้ไขข้อมูล</a>
             </div>
         </section>
-    </div>
+    </main>
 
     <script src="js/select-seat.js"></script>
 </body>

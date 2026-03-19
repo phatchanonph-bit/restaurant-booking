@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เข้าสู่ระบบแอดมิน - My Restaurant</title>
+    <title>เข้าสู่ระบบแอดมิน</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/admin-login.css">
 </head>
 <body>
-    <div class="login-card">
-        <div class="badge">Admin Access</div>
-        <h1>เข้าสู่ระบบแอดมิน</h1>
-        <p class="subtitle">ล็อกอินด้วยข้อมูลจากฐานข้อมูล `admins` เพื่อเข้าหน้าจัดการคิวจอง</p>
+    <main class="page">
+        <section class="login-box">
+            <p class="page-tag">Admin Login</p>
+            <h1>เข้าสู่ระบบแอดมิน</h1>
+            <p class="subtitle">ใช้สำหรับเข้าสู่หน้าจัดการรายการจองของร้านอาหาร</p>
 
-        <form id="login-form">
-            <label class="field-label" for="admin-username">ชื่อผู้ใช้</label>
-            <input id="admin-username" class="login-input" type="text" placeholder="กรอก username" autocomplete="username" required>
+            <form id="login-form" class="login-form">
+                <label for="admin-username">ชื่อผู้ใช้</label>
+                <input id="admin-username" type="text" placeholder="กรอก username" autocomplete="username" required>
 
-            <label class="field-label" for="admin-password">รหัสผ่านแอดมิน</label>
-            <input id="admin-password" class="login-input" type="password" placeholder="กรอกรหัสผ่าน" autocomplete="current-password" required>
+                <label for="admin-password">รหัสผ่าน</label>
+                <input id="admin-password" type="password" placeholder="กรอกรหัสผ่าน" autocomplete="current-password" required>
 
-            <div id="error-message" class="error-message"></div>
+                <p id="error-message" class="error-message" aria-live="polite"></p>
 
-            <div class="actions">
-                <button id="login-button" type="submit" class="btn-login">เข้าสู่หน้าแอดมิน</button>
-                <a href="index.html" class="back-link">← กลับไปหน้าหลัก</a>
-            </div>
-        </form>
-    </div>
+                <button id="login-button" type="submit">เข้าสู่ระบบ</button>
+                <a href="index.html" class="back-link">กลับไปหน้าหลัก</a>
+            </form>
+        </section>
+    </main>
 
     <script src="js/admin-login.js"></script>
 </body>

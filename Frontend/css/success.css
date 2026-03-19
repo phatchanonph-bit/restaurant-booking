@@ -1,30 +1,31 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: 'Noto Sans Thai', sans-serif;
-    background-color: #f6f1ec;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     margin: 0;
-    padding: 24px;
-    background-image:
-        radial-gradient(circle at top right, rgba(214, 182, 145, 0.18), transparent 28%),
-        linear-gradient(rgba(246, 241, 236, 0.88), rgba(246, 241, 236, 0.9)),
-        url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4');
-    background-size: cover;
-    background-position: center;
+    min-height: 100vh;
+    padding: 24px 16px;
+    font-family: "Noto Sans Thai", sans-serif;
+    background-color: #f3f4f6;
+    color: #1f2937;
+}
+
+.page {
+    min-height: calc(100vh - 48px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .success-container {
-    background-color: rgba(255, 255, 255, 0.95);
-    padding: 36px 40px 40px;
-    border-radius: 24px;
-    box-shadow: 0 24px 60px rgba(83, 48, 32, 0.14);
-    border: 1px solid rgba(176, 58, 72, 0.08);
     width: 100%;
-    max-width: 500px;
+    max-width: 520px;
+    padding: 28px;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 14px;
     text-align: center;
-    backdrop-filter: blur(8px);
 }
 
 .success-icon-wrap {
@@ -34,127 +35,77 @@ body {
 }
 
 .success-icon {
-    width: 88px;
-    height: 88px;
+    width: 72px;
+    height: 72px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    font-size: 46px;
-    color: #1f8c50;
-    background: linear-gradient(180deg, #effbf2, #dff4e6);
-    box-shadow: inset 0 0 0 1px rgba(31, 140, 80, 0.12);
+    background-color: #dcfce7;
+    color: #15803d;
+    font-weight: 700;
 }
 
 h1 {
-    color: #a53c4b;
     margin: 0 0 8px;
-    font-size: 34px;
 }
 
-p.subtitle {
-    color: #74675f;
-    margin: 0 0 26px;
-    font-size: 15px;
+.subtitle {
+    margin: 0 0 20px;
+    color: #6b7280;
 }
 
 .details-box {
     text-align: left;
-    background: linear-gradient(180deg, #fff9f6, #fcf3f0);
-    padding: 22px;
-    border-radius: 18px;
-    border: 1px solid #f0ddd6;
-    margin-bottom: 18px;
+    padding: 18px;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    background-color: #f9fafb;
 }
 
 .details-title {
-    font-size: 14px;
+    margin-bottom: 12px;
+    color: #2563eb;
     font-weight: 700;
-    color: #9a4a39;
-    letter-spacing: 0.03em;
-    margin-bottom: 14px;
 }
 
 .detail-item {
     display: flex;
     justify-content: space-between;
-    gap: 18px;
-    margin-bottom: 12px;
-    font-size: 16px;
-    border-bottom: 1px dashed #e9d5b8;
-    padding-bottom: 8px;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #e5e7eb;
 }
 
 .detail-item:last-child {
     border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-.detail-item-table {
-    margin-top: 16px;
 }
 
 .detail-label {
-    color: #6f625b;
-    font-weight: bold;
+    color: #6b7280;
 }
 
 .detail-value {
-    color: #332924;
-    font-weight: bold;
+    font-weight: 700;
     text-align: right;
 }
 
 .detail-value.highlight {
-    color: #b03a48;
-    font-size: 18px;
+    color: #2563eb;
 }
 
 .success-note {
-    margin: 0 0 22px;
-    color: #7a6c65;
-    font-size: 14px;
-    line-height: 1.6;
+    margin: 18px 0;
+    color: #6b7280;
 }
 
 .btn-home {
     display: block;
     width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #b33d4d, #973546);
-    color: white;
-    border: none;
-    border-radius: 16px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background-color: #2563eb;
+    color: #ffffff;
     text-decoration: none;
-    transition: transform 0.25s, box-shadow 0.25s, filter 0.25s;
-    box-sizing: border-box;
-    box-shadow: 0 16px 28px rgba(176, 58, 72, 0.22);
-}
-
-.btn-home:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.03);
-}
-
-@media (max-width: 640px) {
-    body {
-        padding: 16px;
-    }
-
-    .success-container {
-        padding: 28px 22px 24px;
-        border-radius: 20px;
-    }
-
-    h1 {
-        font-size: 28px;
-    }
-
-    .detail-item {
-        font-size: 15px;
-    }
+    font-weight: 700;
 }

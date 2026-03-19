@@ -3,51 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จองสำเร็จ - My Restaurant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <title>จองสำเร็จ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/success.css">
 </head>
 <body>
-    <div class="success-container">
-        <div class="success-icon-wrap">
-            <div class="success-icon">✓</div>
-        </div>
-        <h1>จองโต๊ะสำเร็จ!</h1>
-        <p class="subtitle">ขอบคุณที่เลือกใช้บริการร้านของเรา</p>
+    <main class="page">
+        <section class="success-container">
+            <div class="success-icon-wrap">
+                <div class="success-icon">OK</div>
+            </div>
+            <h1>จองโต๊ะสำเร็จ</h1>
+            <p class="subtitle">ระบบได้บันทึกข้อมูลการจองของคุณเรียบร้อยแล้ว</p>
 
-        <div class="details-box">
-            <div class="details-title">รายละเอียดการจอง</div>
+            <div class="details-box">
+                <div class="details-title">รายละเอียดการจอง</div>
 
-            <div class="detail-item">
-                <span class="detail-label">ชื่อผู้จอง:</span>
-                <span class="detail-value" id="res-name">-</span>
+                <div class="detail-item">
+                    <span class="detail-label">ชื่อผู้จอง</span>
+                    <span class="detail-value" id="res-name">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">เบอร์โทรศัพท์</span>
+                    <span class="detail-value" id="res-phone">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">จำนวนคน</span>
+                    <span class="detail-value" id="res-pax">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">วันที่</span>
+                    <span class="detail-value" id="res-date">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">เวลา</span>
+                    <span class="detail-value" id="res-time">-</span>
+                </div>
+                <div class="detail-item detail-item-table">
+                    <span class="detail-label">โต๊ะที่เลือก</span>
+                    <span class="detail-value highlight" id="res-table">-</span>
+                </div>
             </div>
-            <div class="detail-item">
-                <span class="detail-label">เบอร์โทรศัพท์:</span>
-                <span class="detail-value" id="res-phone">-</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">จำนวนคน:</span>
-                <span class="detail-value" id="res-pax">-</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">วันที่:</span>
-                <span class="detail-value" id="res-date">-</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">เวลา:</span>
-                <span class="detail-value" id="res-time">-</span>
-            </div>
-            <div class="detail-item detail-item-table">
-                <span class="detail-label">โต๊ะที่เลือก:</span>
-                <span class="detail-value highlight" id="res-table">-</span>
-            </div>
-        </div>
 
-        <p class="success-note">กรุณาเก็บรายละเอียดนี้ไว้สำหรับใช้ยืนยันกับทางร้าน</p>
+            <p class="success-note">สามารถใช้หน้านี้เป็นหลักฐานการจองในงานนำเสนอได้</p>
 
-        <a href="index.html" class="btn-home">กลับสู่หน้าหลัก</a>
-    </div>
+            <a href="index.html" class="btn-home">กลับหน้าหลัก</a>
+        </section>
+    </main>
 
     <script src="js/success.js"></script>
 </body>

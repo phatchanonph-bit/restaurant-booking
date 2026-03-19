@@ -1,91 +1,70 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: 'Noto Sans Thai', sans-serif;
-    background-color: #f6f1ec;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     margin: 0;
-    padding: 24px;
-    background-image:
-        radial-gradient(circle at top left, rgba(217, 183, 136, 0.2), transparent 32%),
-        linear-gradient(rgba(246, 241, 236, 0.88), rgba(246, 241, 236, 0.9)),
-        url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4');
-    background-size: cover;
-    background-position: center;
+    min-height: 100vh;
+    padding: 24px 16px;
+    font-family: "Noto Sans Thai", sans-serif;
+    background-color: #f3f4f6;
+    color: #1f2937;
+}
+
+.page {
+    min-height: calc(100vh - 48px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .booking-container {
-    background-color: rgba(255, 255, 255, 0.94);
-    padding: 36px 40px 28px;
-    border-radius: 24px;
-    box-shadow: 0 24px 60px rgba(83, 48, 32, 0.14);
-    border: 1px solid rgba(176, 58, 72, 0.08);
     width: 100%;
-    max-width: 500px;
-    backdrop-filter: blur(8px);
+    max-width: 520px;
+    padding: 28px;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 14px;
 }
 
 .page-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: #f8e7df;
-    color: #9a4a39;
-    font-size: 14px;
+    margin: 0 0 10px;
+    color: #2563eb;
     font-weight: 700;
-    letter-spacing: 0.04em;
-    margin-bottom: 16px;
 }
 
 h1 {
-    text-align: center;
-    color: #a53c4b;
     margin: 0 0 10px;
-    font-size: 34px;
-    line-height: 1.2;
+    font-size: 1.9rem;
 }
 
 .form-intro {
-    text-align: center;
-    color: #74675f;
-    margin: 0 0 28px;
-    font-size: 15px;
-    line-height: 1.7;
+    margin: 0 0 24px;
+    color: #6b7280;
 }
 
 .form-group {
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 
 label {
     display: block;
     margin-bottom: 8px;
-    font-weight: bold;
-    color: #42352f;
-    font-size: 15px;
+    font-weight: 700;
 }
 
 input {
     width: 100%;
-    padding: 14px 15px;
-    border: 1px solid #e5d9d0;
-    border-radius: 14px;
-    box-sizing: border-box;
-    font-family: 'Noto Sans Thai', sans-serif;
-    font-size: 16px;
-    background: #fffdfb;
-    color: #332924;
-    transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-family: "Noto Sans Thai", sans-serif;
+    font-size: 1rem;
 }
 
 input:focus {
-    border-color: #b03a48;
-    outline: none;
-    box-shadow: 0 0 0 4px rgba(176, 58, 72, 0.12);
-    transform: translateY(-1px);
+    outline: 2px solid rgba(37, 99, 235, 0.15);
+    border-color: #2563eb;
 }
 
 .row-group {
@@ -98,74 +77,36 @@ input:focus {
 }
 
 .booking-note {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 6px 0 18px;
+    margin: 4px 0 18px;
     padding: 12px 14px;
-    border-radius: 14px;
-    background: #fbf2eb;
-    color: #7c6358;
-    font-size: 14px;
-}
-
-.note-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 999px;
-    background: #d39b5f;
-    flex-shrink: 0;
+    border-radius: 10px;
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.95rem;
 }
 
 .btn-submit {
     width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #b33d4d, #973546);
-    color: white;
+    padding: 12px 16px;
     border: none;
-    border-radius: 16px;
-    font-size: 18px;
-    font-weight: bold;
+    border-radius: 10px;
+    background-color: #2563eb;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: "Noto Sans Thai", sans-serif;
     cursor: pointer;
-    transition: transform 0.25s, box-shadow 0.25s, filter 0.25s;
-    font-family: 'Noto Sans Thai', sans-serif;
-    margin-top: 10px;
-    box-shadow: 0 16px 28px rgba(176, 58, 72, 0.22);
-}
-
-.btn-submit:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.03);
 }
 
 .back-link {
     display: block;
+    margin-top: 16px;
     text-align: center;
-    margin-top: 22px;
-    color: #7a6c65;
+    color: #4b5563;
     text-decoration: none;
-    font-size: 14px;
-    transition: color 0.25s;
-}
-
-.back-link:hover {
-    color: #b03a48;
 }
 
 @media (max-width: 640px) {
-    body {
-        padding: 16px;
-    }
-
-    .booking-container {
-        padding: 28px 22px 24px;
-        border-radius: 20px;
-    }
-
-    h1 {
-        font-size: 28px;
-    }
-
     .row-group {
         flex-direction: column;
         gap: 0;

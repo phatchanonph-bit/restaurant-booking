@@ -3,155 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Restaurant</title>
-    <link rel="stylesheet" href="css/home.css">
+    <title>ระบบจองโต๊ะร้านอาหาร</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
-    <nav class="navbar">
-        <a href="index.html" class="logo-wrap">
-            <span class="logo-mark">MR</span>
-            <div class="logo-copy">
-                <span class="logo">My Restaurant</span>
-                <span class="logo-subtitle">Reserve your table in style</span>
+    <header class="site-header">
+        <div class="brand">
+            <div class="brand-mark">MR</div>
+            <div>
+                <h1 class="brand-title">My Restaurant</h1>
+                <p class="brand-subtitle">ระบบจองโต๊ะร้านอาหาร</p>
             </div>
-        </a>
+        </div>
+        <nav class="site-nav">
+            <a href="index.html">หน้าหลัก</a>
+            <a href="#features">การทำงาน</a>
+            <a href="admin-login.html">แอดมิน</a>
+        </nav>
+    </header>
 
-        <ul class="nav-links">
-            <li><a href="index.html">หน้าหลัก</a></li>
-            <li><a href="#menu-section">เมนู</a></li>
-            <li><a href="#restaurant-section">บรรยากาศร้าน</a></li>
-            <li><a href="admin-login.html" class="admin-link">แอดมิน</a></li>
-        </ul>
-    </nav>
-
-    <main>
+    <main class="page">
         <section class="hero">
-            <div class="hero-bg-shape hero-bg-shape-left"></div>
-            <div class="hero-bg-shape hero-bg-shape-right"></div>
-
-            <div class="hero-content">
-                <div class="hero-copy">
-                    <span class="eyebrow">Premium Dining Experience</span>
-                    <h1>จองโต๊ะสำหรับมื้อพิเศษ ในบรรยากาศที่อบอุ่นและน่าจดจำ</h1>
-                    <p>
-                        สำรองโต๊ะล่วงหน้าได้ง่าย เลือกช่วงเวลาได้ชัดเจน
-                        พร้อมมุมร้านสวย ๆ และเมนูจานเด่นที่เหมาะทั้งมากับคนรัก ครอบครัว หรือเพื่อนสนิท
-                    </p>
-
-                    <div class="hero-actions">
-                        <button class="btn-book" onclick="window.location.href='booking.html'">จองโต๊ะตอนนี้</button>
-                        <a href="#menu-section" class="btn-secondary">ดูเมนูแนะนำ</a>
-                    </div>
-
-                    <div class="hero-stats">
-                        <div class="stat-card">
-                            <strong>3 ชั่วโมง</strong>
-                            <span>ต่อรอบการจอง</span>
-                        </div>
-                        <div class="stat-card">
-                            <strong>Realtime</strong>
-                            <span>อัปเดตสถานะโต๊ะทันที</span>
-                        </div>
-                        <div class="stat-card">
-                            <strong>หลายโซน</strong>
-                            <span>เหมาะทั้งเดทและกลุ่มใหญ่</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="hero-visual">
-                    <article class="hero-card hero-card-main">
-                        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=80" alt="เมนูย่างพิเศษ">
-                        <div class="hero-card-caption">
-                            <span>Chef's Special</span>
-                            <strong>เซ็ตย่างซิกเนเจอร์</strong>
-                        </div>
-                    </article>
-
-                    <article class="hero-card hero-card-top">
-                        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80" alt="เมนูอาหารยอดนิยม">
-                    </article>
-
-                    <article class="hero-card hero-card-bottom">
-                        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80" alt="เมนูสลัดและอาหารสุขภาพ">
-                    </article>
+            <div class="hero-text">
+                <p class="section-label">Demo Project</p>
+                <h2>ระบบจองโต๊ะออนไลน์สำหรับร้านอาหาร</h2>
+                <p class="hero-description">
+                    โปรเจกต์นี้ใช้สำหรับให้ลูกค้ากรอกข้อมูลการจอง เลือกโต๊ะ และให้แอดมินตรวจสอบรายการจองผ่านหน้าเว็บได้
+                </p>
+                <div class="hero-actions">
+                    <a class="primary-button" href="booking.html">เริ่มจองโต๊ะ</a>
+                    <a class="secondary-button" href="#features">ดูรายละเอียด</a>
                 </div>
             </div>
+            <div class="hero-card">
+                <h3>ขั้นตอนการใช้งาน</h3>
+                <ol class="step-list">
+                    <li>กรอกชื่อ เบอร์โทร จำนวนคน วันที่ และเวลา</li>
+                    <li>เลือกโต๊ะที่ว่างในรอบเวลานั้น</li>
+                    <li>ยืนยันรายการจอง</li>
+                    <li>แอดมินตรวจสอบและจัดการรายการได้</li>
+                </ol>
+            </div>
         </section>
 
-        <section class="menu-section" id="menu-section">
-            <div class="section-heading">
-                <span class="section-kicker">Popular Dishes</span>
-                <h2>เมนูยอดนิยมของร้าน</h2>
-                <p>คัดเมนูขายดีที่ทั้งหน้าตาดีและเหมาะสำหรับการแชร์บนโต๊ะอาหาร</p>
-            </div>
-
-            <div class="feature-grid">
-                <article class="feature-card feature-card-large">
-                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80" alt="เมนูจานหลัก">
-                    <div class="feature-copy">
-                        <span>Signature Plate</span>
-                        <h3>จานหลักจัดเต็ม สำหรับมื้อที่อยากให้ทุกคนประทับใจ</h3>
-                        <p>รวมรสชาติที่เข้มข้นและการจัดจานที่โดดเด่น เหมาะกับการสั่งแชร์ทั้งโต๊ะ</p>
-                    </div>
+        <section class="content-section" id="features">
+            <p class="section-label">Features</p>
+            <h2>ฟังก์ชันหลักของระบบ</h2>
+            <div class="info-grid">
+                <article class="info-card">
+                    <h3>หน้าลูกค้า</h3>
+                    <p>ลูกค้าสามารถกรอกข้อมูลการจองและเลือกโต๊ะได้ด้วยตัวเองผ่านหน้าเว็บ</p>
                 </article>
-
-                <article class="feature-card">
-                    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=80" alt="เมนูย่าง">
-                    <div class="feature-copy">
-                        <span>Grill Selection</span>
-                        <h3>เมนูย่างหอม ๆ</h3>
-                        <p>วัตถุดิบแน่น รสชาติเข้ม เหมาะกับสายปาร์ตี้และสายกินจริงจัง</p>
-                    </div>
+                <article class="info-card">
+                    <h3>เลือกโต๊ะแบบทันที</h3>
+                    <p>ระบบแสดงโต๊ะที่จองแล้วและโต๊ะที่ยังว่าง เพื่อช่วยลดการจองซ้ำ</p>
                 </article>
-
-                <article class="feature-card">
-                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80" alt="เมนูสุขภาพ">
-                    <div class="feature-copy">
-                        <span>Fresh Bowl</span>
-                        <h3>เมนูสดชื่นสีสันสวย</h3>
-                        <p>เติมความบาลานซ์ให้มื้ออาหารด้วยผักสด ธัญพืช และโปรตีนคุณภาพ</p>
-                    </div>
+                <article class="info-card">
+                    <h3>หน้าแอดมิน</h3>
+                    <p>แอดมินสามารถดูรายการทั้งหมด ยืนยัน ปฏิเสธ หรือลบรายการจองได้</p>
                 </article>
             </div>
         </section>
 
-        <section class="restaurant-section" id="restaurant-section">
-            <div class="section-heading section-heading-light">
-                <span class="section-kicker">Restaurant Atmosphere</span>
-                <h2>บรรยากาศร้านที่ชวนให้นั่งนานขึ้นอีกนิด</h2>
-                <p>มุมที่เหมาะกับทุกโอกาส ตั้งแต่มื้อสบาย ๆ ไปจนถึงดินเนอร์สำคัญ</p>
-            </div>
-
-            <div class="table-gallery">
-                <article class="table-item">
-                    <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=80" alt="โต๊ะอาหารในร้าน">
-                    <div class="table-copy">
-                        <h3>โซนรับประทานอาหารหลัก</h3>
-                        <p>โปร่ง โล่ง สบาย เหมาะกับการนัดทานข้าวและรวมกลุ่มเล็ก</p>
-                    </div>
-                </article>
-
-                <article class="table-item table-item-highlight">
-                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80" alt="บรรยากาศร้านอาหาร">
-                    <div class="table-copy">
-                        <h3>มุมดินเนอร์อบอุ่น</h3>
-                        <p>แสงสวยและเป็นส่วนตัว เหมาะกับวันพิเศษหรือมื้อค่ำที่อยากให้ประทับใจ</p>
-                    </div>
-                </article>
-
-                <article class="table-item">
-                    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80" alt="มุมโต๊ะในร้านอาหาร">
-                    <div class="table-copy">
-                        <h3>โต๊ะสำหรับครอบครัว</h3>
-                        <p>รองรับหลายคนได้สบาย พร้อมพื้นที่สำหรับนั่งคุยกันยาว ๆ</p>
-                    </div>
-                </article>
-            </div>
-        </section>
     </main>
 </body>
 </html>
