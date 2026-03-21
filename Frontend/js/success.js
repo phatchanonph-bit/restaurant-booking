@@ -1,8 +1,14 @@
-document.getElementById('res-name').innerText = localStorage.getItem('bookName') || '-';
-document.getElementById('res-phone').innerText = localStorage.getItem('bookPhone') || '-';
+const bookingFields = {
+    "res-name": "bookName",
+    "res-phone": "bookPhone",
+    "res-date": "bookDate",
+    "res-time": "bookTime",
+    "res-table": "bookTable"
+};
 
-const pax = localStorage.getItem('bookPax');
-document.getElementById('res-pax').innerText = pax ? `${pax} ท่าน` : '-';
-document.getElementById('res-date').innerText = localStorage.getItem('bookDate') || '-';
-document.getElementById('res-time').innerText = localStorage.getItem('bookTime') || '-';
-document.getElementById('res-table').innerText = localStorage.getItem('bookTable') || '-';
+Object.entries(bookingFields).forEach(([elementId, storageKey]) => {
+    document.getElementById(elementId).innerText = localStorage.getItem(storageKey) || "-";
+});
+
+const pax = localStorage.getItem("bookPax");
+document.getElementById("res-pax").innerText = pax ? `${pax} ท่าน` : "-";

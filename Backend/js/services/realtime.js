@@ -1,7 +1,5 @@
-// จัดการ realtime แบบ Server-Sent Events เพื่อแจ้งการเปลี่ยนแปลง booking ไปยังหน้าเว็บ
 const clients = new Set();
 
-// ส่ง event หนึ่งก้อนไปยัง client ที่เชื่อมต่ออยู่
 function sendEvent(client, eventName, payload) {
     client.write(`event: ${eventName}\n`);
     client.write(`data: ${JSON.stringify(payload)}\n\n`);
