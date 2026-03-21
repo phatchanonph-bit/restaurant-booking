@@ -1,6 +1,44 @@
-const ADMIN_TOKEN_KEY = 'restaurant_admin_token';
-const ADMIN_USER_KEY = 'restaurant_admin_user';
-const API_URL = (() => {
+const API_URL = getApiUrl();
+
+const STORAGE_KEYS = {
+    token: "restaurant_admin_token",
+    user: "restaurant_admin_user"
+};
+
+const BOOKING_STATUS = {
+    approved: "ยืนยันแล้ว",
+    rejected: "ปฏิเสธแล้ว",
+    pending: "รอยืนยัน"
+};
+
+const MESSAGES = {
+    noPending: "ไม่มีรายการจองที่ต้องจัดการในตอนนี้",
+    noApproved: "ยังไม่มีรายการที่ยืนยันแล้ว",
+    realtimeConnected: "Realtime: เชื่อมต่อแล้ว",
+    realtimeError: "Realtime: โหลดข้อมูลไม่สำเร็จ",
+    realtimeReconnecting: "Realtime: หลุดการเชื่อมต่อ กำลังเชื่อมต่อใหม่...",
+    sessionExpired: "เซสชันหมดอายุ",
+    updateFailed: "ไม่สามารถอัปเดตสถานะได้",
+    deleteFailed: "ไม่สามารถลบข้อมูลได้"
+};
+
+const elements = {
+    pendingTableBody: document.getElementById("booking-list"),
+    approvedTableBody: document.getElementById("approved-booking-list"),
+    noPendingMessage: document.getElementById("no-data"),
+    noApprovedMessage: document.getElementById("no-approved-data"),
+    liveStatus: document.getElementById("live-status"),
+    lastUpdate: document.getElementById("last-update"),
+    logoutButton: document.getElementById("logout-button")
+};
+
+const adminToken = localStorage.getItem(STORAGE_KEYS.token);
+
+if (!adminToken) {
+    redirectToLogin();
+}
+
+function getApiUrl() {
     if (!window.location.protocol.startsWith("http")) {
         return "http://localhost:3000";
     }
@@ -11,194 +49,234 @@ const API_URL = (() => {
 
     const host = window.location.hostname || "localhost";
     return `${window.location.protocol}//${host}:3000`;
-})();
-const pendingTableBody = document.getElementById('booking-list');
-const approvedTableBody = document.getElementById('approved-booking-list');
-const noDataMsg = document.getElementById('no-data');
-const noApprovedDataMsg = document.getElementById('no-approved-data');
-const liveStatus = document.getElementById('live-status');
-const lastUpdate = document.getElementById('last-update');
-const logoutButton = document.getElementById('logout-button');
-const adminToken = localStorage.getItem(ADMIN_TOKEN_KEY);
-
-if (!adminToken) {
-    window.location.href = 'admin-login.html';
 }
 
-function getAdminHeaders(extraHeaders = {}) {
+function redirectToLogin() {
+    window.location.href = "admin-login.html";
+}
+
+function clearAdminSession() {
+    localStorage.removeItem(STORAGE_KEYS.token);
+    localStorage.removeItem(STORAGE_KEYS.user);
+}
+
+function logoutAndRedirect() {
+    clearAdminSession();
+    redirectToLogin();
+}
+
+function getAuthHeaders(extraHeaders = {}) {
     return {
         ...extraHeaders,
         Authorization: `Bearer ${adminToken}`
     };
 }
 
-async function verifyAdminSession() {
-    try {
-        const response = await fetch(`${API_URL}/admin/verify`, {
-            headers: getAdminHeaders()
-        });
-
-        if (!response.ok) {
-            throw new Error('เซสชันหมดอายุ');
-        }
-    } catch (error) {
-        localStorage.removeItem(ADMIN_TOKEN_KEY);
-        localStorage.removeItem(ADMIN_USER_KEY);
-        window.location.href = 'admin-login.html';
-    }
-}
-
-function setLastUpdate() {
-    lastUpdate.textContent = `อัปเดตล่าสุด: ${new Date().toLocaleString('th-TH')}`;
+function updateLastRefreshTime() {
+    elements.lastUpdate.textContent = `อัปเดตล่าสุด: ${new Date().toLocaleString("th-TH")}`;
 }
 
 function getStatusClass(status) {
-    if (status === 'ยืนยันแล้ว') return 'approved';
-    if (status === 'ปฏิเสธแล้ว') return 'rejected';
-    return 'pending';
+    if (status === BOOKING_STATUS.approved) {
+        return "approved";
+    }
+
+    if (status === BOOKING_STATUS.rejected) {
+        return "rejected";
+    }
+
+    return "pending";
 }
 
 function formatBookingDate(dateValue) {
     if (!dateValue) {
-        return '-';
+        return "-";
     }
 
-    if (typeof dateValue === 'string' && dateValue.includes('T')) {
+    if (typeof dateValue === "string" && dateValue.includes("T")) {
         return dateValue.slice(0, 10);
     }
 
     return dateValue;
 }
 
-function addHoursToTime(timeValue, hoursToAdd) {
+function addHours(timeValue, hoursToAdd) {
     if (!timeValue) {
-        return '-';
+        return "-";
     }
 
-    const [hours, minutes] = timeValue.split(':').map(Number);
-    const totalMinutes = (hours * 60) + minutes + (hoursToAdd * 60);
-    const normalizedMinutes = ((totalMinutes % 1440) + 1440) % 1440;
-    const nextHours = String(Math.floor(normalizedMinutes / 60)).padStart(2, '0');
-    const nextMinutes = String(normalizedMinutes % 60).padStart(2, '0');
-    return `${nextHours}:${nextMinutes}:00`;
+    const [hours, minutes] = timeValue.split(":").map(Number);
+    const currentMinutes = (hours * 60) + minutes;
+    const nextMinutes = currentMinutes + (hoursToAdd * 60);
+    const safeMinutes = ((nextMinutes % 1440) + 1440) % 1440;
+    const nextHours = String(Math.floor(safeMinutes / 60)).padStart(2, "0");
+    const nextMinuteText = String(safeMinutes % 60).padStart(2, "0");
+
+    return `${nextHours}:${nextMinuteText}:00`;
 }
 
-function createActionButtons(book) {
-    const approveButton = book.status === 'ยืนยันแล้ว'
-        ? ''
-        : `<button class="btn btn-approve" onclick="updateStatus(${book.id}, 'ยืนยันแล้ว')">ยืนยัน</button>`;
+function getBookingTimeRange(booking) {
+    const startTime = booking.time || "-";
+    const endTime = addHours(booking.time, 3);
+    return `${startTime} - ${endTime}`;
+}
+
+function createActionButtons(booking) {
+    const approveButton = booking.status === BOOKING_STATUS.approved
+        ? ""
+        : `<button class="btn btn-approve" onclick="updateStatus(${booking.id}, '${BOOKING_STATUS.approved}')">ยืนยัน</button>`;
 
     return `
         ${approveButton}
-        <button class="btn btn-reject" onclick="rejectBooking(${book.id})">ปฏิเสธ</button>
-        <button class="btn btn-delete" onclick="deleteBooking(${book.id})">ลบ</button>
+        <button class="btn btn-reject" onclick="rejectBooking(${booking.id})">ปฏิเสธ</button>
+        <button class="btn btn-delete" onclick="deleteBooking(${booking.id})">ลบ</button>
     `;
 }
 
-function createBookingRow(book) {
-    const statusClass = getStatusClass(book.status);
-    const bookingDate = formatBookingDate(book.date);
-    const bookingEndTime = addHoursToTime(book.time, 3);
-    const tableDisplay = book.table_number
-        ? `
-            <div class="table-summary">
-                <span class="table-chip">${book.table_number}</span>
-                <span class="slot-hint">${bookingDate} ${book.time} - ${bookingEndTime}</span>
-            </div>
-        `
-        : '<span class="table-pending">ยังไม่ได้เลือกโต๊ะ</span>';
+function createTableSummary(booking) {
+    if (!booking.table_number) {
+        return '<span class="table-pending">ยังไม่ได้เลือกโต๊ะ</span>';
+    }
+
+    const bookingDate = formatBookingDate(booking.date);
+    const bookingTimeRange = getBookingTimeRange(booking);
+
+    return `
+        <div class="table-summary">
+            <span class="table-chip">${booking.table_number}</span>
+            <span class="slot-hint">${bookingDate} ${bookingTimeRange}</span>
+        </div>
+    `;
+}
+
+function createBookingRow(booking) {
+    const bookingDate = formatBookingDate(booking.date);
+    const bookingTimeRange = getBookingTimeRange(booking);
+    const statusClass = getStatusClass(booking.status);
+    const statusText = booking.status || BOOKING_STATUS.pending;
 
     return `
         <tr>
-            <td>${book.id}</td>
-            <td>${book.name}</td>
-            <td>${book.phone}</td>
-            <td>${book.people} ท่าน</td>
+            <td>${booking.id}</td>
+            <td>${booking.name}</td>
+            <td>${booking.phone}</td>
+            <td>${booking.people} ท่าน</td>
             <td class="slot-cell">
                 <span class="slot-date">${bookingDate}</span>
-                <span class="slot-time">${book.time} - ${bookingEndTime}</span>
+                <span class="slot-time">${bookingTimeRange}</span>
             </td>
-            <td>${tableDisplay}</td>
-            <td><span class="status ${statusClass}">${book.status || 'รอยืนยัน'}</span></td>
-            <td>${createActionButtons(book)}</td>
+            <td>${createTableSummary(booking)}</td>
+            <td><span class="status ${statusClass}">${statusText}</span></td>
+            <td>${createActionButtons(booking)}</td>
         </tr>
     `;
 }
 
-function renderBookings(list, targetElement, emptyElement, emptyText) {
-    targetElement.innerHTML = '';
-
+function renderBookings(list, tableBody, emptyMessageElement, emptyText) {
     if (!list.length) {
-        emptyElement.textContent = emptyText;
-        emptyElement.style.display = 'block';
+        tableBody.innerHTML = "";
+        emptyMessageElement.textContent = emptyText;
+        emptyMessageElement.style.display = "block";
         return;
     }
 
-    emptyElement.style.display = 'none';
-    targetElement.innerHTML = list.map(createBookingRow).join('');
+    emptyMessageElement.style.display = "none";
+    tableBody.innerHTML = list.map(createBookingRow).join("");
+}
+
+async function fetchJson(url, options = {}) {
+    const response = await fetch(url, options);
+
+    if (response.status === 401) {
+        throw new Error(MESSAGES.sessionExpired);
+    }
+
+    return response;
+}
+
+function handleSessionError(error) {
+    if (error.message === MESSAGES.sessionExpired) {
+        logoutAndRedirect();
+        return true;
+    }
+
+    return false;
+}
+
+async function verifyAdminSession() {
+    try {
+        await fetchJson(`${API_URL}/admin/verify`, {
+            headers: getAuthHeaders()
+        });
+    } catch (error) {
+        logoutAndRedirect();
+    }
 }
 
 async function loadBookings() {
     try {
-        const res = await fetch(`${API_URL}/admin/bookings`, {
-            headers: getAdminHeaders()
+        const response = await fetchJson(`${API_URL}/admin/bookings`, {
+            headers: getAuthHeaders()
         });
-        const data = await res.json();
+        const bookings = await response.json();
 
-        if (res.status === 401) {
-            throw new Error('unauthorized');
+        if (!Array.isArray(bookings)) {
+            throw new Error("รูปแบบข้อมูลไม่ถูกต้อง");
         }
 
-        if (!Array.isArray(data)) {
-            throw new Error('รูปแบบข้อมูลไม่ถูกต้อง');
-        }
+        const approvedBookings = bookings.filter(booking => booking.status === BOOKING_STATUS.approved);
+        const pendingBookings = bookings.filter(booking => booking.status !== BOOKING_STATUS.approved);
 
-        const approvedBookings = data.filter(book => book.status === 'ยืนยันแล้ว');
-        const otherBookings = data.filter(book => book.status !== 'ยืนยันแล้ว');
+        renderBookings(
+            pendingBookings,
+            elements.pendingTableBody,
+            elements.noPendingMessage,
+            MESSAGES.noPending
+        );
+        renderBookings(
+            approvedBookings,
+            elements.approvedTableBody,
+            elements.noApprovedMessage,
+            MESSAGES.noApproved
+        );
+        updateLastRefreshTime();
+    } catch (error) {
+        console.error("Load Bookings Error:", error);
 
-        renderBookings(otherBookings, pendingTableBody, noDataMsg, 'ไม่มีรายการจองที่ต้องจัดการในตอนนี้');
-        renderBookings(approvedBookings, approvedTableBody, noApprovedDataMsg, 'ยังไม่มีรายการที่ยืนยันแล้ว');
-        setLastUpdate();
-    } catch (err) {
-        console.error("Fetch Error:", err);
-        if (err.message === 'unauthorized') {
-            localStorage.removeItem(ADMIN_TOKEN_KEY);
-            localStorage.removeItem(ADMIN_USER_KEY);
-            window.location.href = 'admin-login.html';
+        if (handleSessionError(error)) {
             return;
         }
-        liveStatus.textContent = 'Realtime: โหลดข้อมูลไม่สำเร็จ';
+
+        elements.liveStatus.textContent = MESSAGES.realtimeError;
     }
 }
 
 async function updateStatus(id, newStatus) {
     try {
-        const response = await fetch(`${API_URL}/admin/update-status`, {
+        const response = await fetchJson(`${API_URL}/admin/update-status`, {
             method: "POST",
-            headers: getAdminHeaders({ "Content-Type": "application/json" }),
+            headers: getAuthHeaders({ "Content-Type": "application/json" }),
             body: JSON.stringify({ id, status: newStatus })
         });
 
-        if (response.status === 401) {
-            throw new Error('เซสชันหมดอายุ');
+        if (!response.ok) {
+            throw new Error(MESSAGES.updateFailed);
         }
 
-        if (!response.ok) {
-            throw new Error('อัปเดตสถานะไม่สำเร็จ');
-        }
-    } catch (err) {
-        if (err.message === 'เซสชันหมดอายุ') {
-            localStorage.removeItem(ADMIN_TOKEN_KEY);
-            localStorage.removeItem(ADMIN_USER_KEY);
-            window.location.href = 'admin-login.html';
+        await loadBookings();
+    } catch (error) {
+        if (handleSessionError(error)) {
             return;
         }
-        alert("ไม่สามารถอัปเดตสถานะได้");
+
+        alert(MESSAGES.updateFailed);
     }
 }
 
 async function rejectBooking(id) {
-    if (!confirm(`ต้องการปฏิเสธและลบรายการจอง ID: ${id} หรือไม่?`)) {
+    const confirmed = confirm(`ต้องการปฏิเสธและลบรายการจอง ID: ${id} หรือไม่?`);
+
+    if (!confirmed) {
         return;
     }
 
@@ -206,72 +284,79 @@ async function rejectBooking(id) {
 }
 
 async function deleteBooking(id, skipConfirm = false) {
-    if (!skipConfirm && !confirm(`ต้องการลบรายการจอง ID: ${id} หรือไม่?`)) {
+    const confirmed = skipConfirm || confirm(`ต้องการลบรายการจอง ID: ${id} หรือไม่?`);
+
+    if (!confirmed) {
         return;
     }
 
     try {
-        const response = await fetch(`${API_URL}/admin/delete/${id}`, {
+        const response = await fetchJson(`${API_URL}/admin/delete/${id}`, {
             method: "DELETE",
-            headers: getAdminHeaders()
+            headers: getAuthHeaders()
         });
 
-        if (response.status === 401) {
-            throw new Error('เซสชันหมดอายุ');
+        if (!response.ok) {
+            throw new Error(MESSAGES.deleteFailed);
         }
 
-        if (!response.ok) {
-            throw new Error('ลบข้อมูลไม่สำเร็จ');
-        }
-    } catch (err) {
-        if (err.message === 'เซสชันหมดอายุ') {
-            localStorage.removeItem(ADMIN_TOKEN_KEY);
-            localStorage.removeItem(ADMIN_USER_KEY);
-            window.location.href = 'admin-login.html';
+        await loadBookings();
+    } catch (error) {
+        if (handleSessionError(error)) {
             return;
         }
-        alert("ไม่สามารถลบข้อมูลได้");
+
+        alert(MESSAGES.deleteFailed);
     }
 }
 
-const eventSource = new EventSource(`${API_URL}/events`);
-
-eventSource.addEventListener('connected', () => {
-    liveStatus.textContent = 'Realtime: เชื่อมต่อแล้ว';
-});
-
-eventSource.addEventListener('booking-change', () => {
-    liveStatus.textContent = 'Realtime: เชื่อมต่อแล้ว';
-    loadBookings();
-});
-
-eventSource.onerror = () => {
-    liveStatus.textContent = 'Realtime: หลุดการเชื่อมต่อ กำลังเชื่อมต่อใหม่...';
-};
-
-logoutButton.addEventListener('click', async () => {
+async function logout() {
     try {
         await fetch(`${API_URL}/admin/logout`, {
-            method: 'POST',
-            headers: getAdminHeaders()
+            method: "POST",
+            headers: getAuthHeaders()
         });
     } catch (error) {
-        console.error('Logout Error:', error);
+        console.error("Logout Error:", error);
     }
 
-    localStorage.removeItem(ADMIN_TOKEN_KEY);
-    localStorage.removeItem(ADMIN_USER_KEY);
-    window.location.href = 'admin-login.html';
-});
+    logoutAndRedirect();
+}
 
-const autoRefreshInterval = setInterval(loadBookings, 30000);
+function setupRealtimeUpdates() {
+    const eventSource = new EventSource(`${API_URL}/events`);
 
-window.addEventListener('beforeunload', () => {
-    clearInterval(autoRefreshInterval);
-    eventSource.close();
-});
+    eventSource.addEventListener("connected", () => {
+        elements.liveStatus.textContent = MESSAGES.realtimeConnected;
+    });
 
-window.onload = async () => {
-    await verifyAdminSession();
-    await loadBookings();
-};
+    eventSource.addEventListener("booking-change", () => {
+        elements.liveStatus.textContent = MESSAGES.realtimeConnected;
+        loadBookings();
+    });
+
+    eventSource.onerror = () => {
+        elements.liveStatus.textContent = MESSAGES.realtimeReconnecting;
+    };
+
+    return eventSource;
+}
+
+function startPage() {
+    const eventSource = setupRealtimeUpdates();
+    const autoRefreshInterval = setInterval(loadBookings, 30000);
+
+    elements.logoutButton.addEventListener("click", logout);
+
+    window.addEventListener("beforeunload", () => {
+        clearInterval(autoRefreshInterval);
+        eventSource.close();
+    });
+
+    verifyAdminSession().then(loadBookings);
+}
+
+window.updateStatus = updateStatus;
+window.rejectBooking = rejectBooking;
+window.deleteBooking = deleteBooking;
+window.addEventListener("load", startPage);

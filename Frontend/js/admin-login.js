@@ -1,4 +1,26 @@
-const API_URL = (() => {
+const API_URL = getApiUrl();
+
+const STORAGE_KEYS = {
+    token: "restaurant_admin_token",
+    user: "restaurant_admin_user"
+};
+
+const TEXT = {
+    checking: "กำลังตรวจสอบ...",
+    login: "เข้าสู่หน้าแอดมิน",
+    loginFailed: "เข้าสู่ระบบไม่สำเร็จ",
+    invalidResponse: "ไม่สามารถเข้าสู่ระบบได้"
+};
+
+const elements = {
+    form: document.getElementById("login-form"),
+    usernameInput: document.getElementById("admin-username"),
+    passwordInput: document.getElementById("admin-password"),
+    loginButton: document.getElementById("login-button"),
+    errorMessage: document.getElementById("error-message")
+};
+
+function getApiUrl() {
     if (!window.location.protocol.startsWith("http")) {
         return "http://localhost:3000";
     }
@@ -9,23 +31,28 @@ const API_URL = (() => {
 
     const host = window.location.hostname || "localhost";
     return `${window.location.protocol}//${host}:3000`;
-})();
+}
 
-const ADMIN_TOKEN_KEY = "restaurant_admin_token";
-const ADMIN_USER_KEY = "restaurant_admin_user";
+function clearStoredLogin() {
+    localStorage.removeItem(STORAGE_KEYS.token);
+    localStorage.removeItem(STORAGE_KEYS.user);
+}
 
-const loginForm = document.getElementById("login-form");
-const usernameInput = document.getElementById("admin-username");
-const passwordInput = document.getElementById("admin-password");
-const loginButton = document.getElementById("login-button");
-const errorMessage = document.getElementById("error-message");
+function goToAdminPage() {
+    window.location.href = "admin.html";
+}
 
-function setError(message) {
-    errorMessage.textContent = message;
+function setError(message = "") {
+    elements.errorMessage.textContent = message;
+}
+
+function setLoginButtonState(isLoading) {
+    elements.loginButton.disabled = isLoading;
+    elements.loginButton.textContent = isLoading ? TEXT.checking : TEXT.login;
 }
 
 async function verifyExistingLogin() {
-    const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+    const token = localStorage.getItem(STORAGE_KEYS.token);
 
     if (!token) {
         return;
@@ -39,22 +66,20 @@ async function verifyExistingLogin() {
         });
 
         if (response.ok) {
-            window.location.href = "admin.html";
+            goToAdminPage();
             return;
         }
     } catch (error) {
         console.error("Verify Login Error:", error);
     }
 
-    localStorage.removeItem(ADMIN_TOKEN_KEY);
-    localStorage.removeItem(ADMIN_USER_KEY);
+    clearStoredLogin();
 }
 
-loginForm.addEventListener("submit", async event => {
+async function submitLogin(event) {
     event.preventDefault();
-    setError("");
-    loginButton.disabled = true;
-    loginButton.textContent = "กำลังตรวจสอบ...";
+    setError();
+    setLoginButtonState(true);
 
     try {
         const response = await fetch(`${API_URL}/admin/login`, {
@@ -63,28 +88,27 @@ loginForm.addEventListener("submit", async event => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                username: usernameInput.value.trim(),
-                password: passwordInput.value
+                username: elements.usernameInput.value.trim(),
+                password: elements.passwordInput.value
             })
         });
-
         const result = await response.json();
 
         if (!response.ok) {
-            throw new Error(result.error || "ไม่สามารถเข้าสู่ระบบได้");
+            throw new Error(result.error || TEXT.invalidResponse);
         }
 
-        localStorage.setItem(ADMIN_TOKEN_KEY, result.token);
-        localStorage.setItem(ADMIN_USER_KEY, result.admin.username);
-        window.location.href = "admin.html";
+        localStorage.setItem(STORAGE_KEYS.token, result.token);
+        localStorage.setItem(STORAGE_KEYS.user, result.admin.username);
+        goToAdminPage();
     } catch (error) {
-        setError(error.message || "เข้าสู่ระบบไม่สำเร็จ");
-        passwordInput.focus();
-        passwordInput.select();
+        setError(error.message || TEXT.loginFailed);
+        elements.passwordInput.focus();
+        elements.passwordInput.select();
     } finally {
-        loginButton.disabled = false;
-        loginButton.textContent = "เข้าสู่หน้าแอดมิน";
+        setLoginButtonState(false);
     }
-});
+}
 
+elements.form.addEventListener("submit", submitLogin);
 verifyExistingLogin();
