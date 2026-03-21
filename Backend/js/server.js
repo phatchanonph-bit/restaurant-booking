@@ -4,7 +4,6 @@ const app = require("./app");
 const db = require("./config/db");
 
 const PORT = Number(process.env.PORT || 3000);
-// ใช้ app เป็นตัวจัดการ request ทุกครั้งที่มีคนเรียกเข้ามา
 const server = http.createServer(app);
 
 // ลองเชื่อมต่อฐานข้อมูลตอนเปิดระบบ เพื่อเช็กว่าพร้อมใช้งานหรือไม่

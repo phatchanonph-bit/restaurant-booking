@@ -16,13 +16,11 @@ const CONTENT_TYPES = {
 
 // เติมความสามารถพื้นฐานให้ response object ของ Node
 function addResponseHelpers(res) {
-    // ใช้กำหนด status code แล้ว return res เพื่อให้ chain ต่อได้
     res.status = code => {
         res.statusCode = code;
         return res;
     };
 
-    // ส่งข้อมูลกลับเป็น JSON
     res.json = data => {
         if (!res.headersSent) {
             res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -31,7 +29,6 @@ function addResponseHelpers(res) {
         res.end(JSON.stringify(data));
     };
 
-    // ส่งข้อความธรรมดากลับไป
     res.send = text => {
         if (!res.headersSent) {
             res.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -46,7 +43,6 @@ function addResponseHelpers(res) {
         const contentType = CONTENT_TYPES[extension] || "application/octet-stream";
 
         fs.stat(filePath, (error, stats) => {
-            // ถ้าไฟล์ไม่มีอยู่จริงหรือไม่ใช่ไฟล์ ให้ตอบ 404
             if (error || !stats.isFile()) {
                 res.status(404).send("Not Found");
                 return;
@@ -55,13 +51,11 @@ function addResponseHelpers(res) {
             res.statusCode = res.statusCode || 200;
             res.setHeader("Content-Type", contentType);
 
-            // HEAD ขอแค่ header ไม่ต้องส่งเนื้อไฟล์จริง
             if (res.req.method === "HEAD") {
                 res.end();
                 return;
             }
 
-            // ใช้ stream เพื่อลดการใช้หน่วยความจำเวลาอ่านไฟล์
             const stream = fs.createReadStream(filePath);
             stream.on("error", () => {
                 if (!res.headersSent) {
@@ -88,7 +82,6 @@ function addCorsHeaders(res) {
 // อ่าน body ที่ส่งมา แล้วแปลงจาก JSON string เป็น object
 function parseJsonBody(req) {
     return new Promise((resolve, reject) => {
-        // GET และ HEAD ปกติจะไม่มี body
         if (req.method === "GET" || req.method === "HEAD") {
             resolve({});
             return;
@@ -109,7 +102,6 @@ function parseJsonBody(req) {
             try {
                 resolve(JSON.parse(rawBody));
             } catch (error) {
-                // โยน error กลับไปให้ app.js จัดการตอบ 400
                 reject(new Error("INVALID_JSON"));
             }
         });
